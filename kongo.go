@@ -10,7 +10,8 @@ type Kongo struct {
 	client  *http.Client
 	baseUrl string
 
-	Node NodeService
+	Node    NodeService
+	Cluster ClusterService
 }
 
 func New(url string) (*Kongo, error) {
@@ -20,6 +21,7 @@ func New(url string) (*Kongo, error) {
 
 	k := &Kongo{client: http.DefaultClient, baseUrl: url}
 	k.Node = &NodeServiceOp{client: k}
+	k.Cluster = &ClusterServiceOp{client: k}
 
 	return k, nil
 }
