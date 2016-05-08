@@ -40,6 +40,7 @@ func (s *KongoTestSuite) TestFactoryWithEmptyUrl() {
 func (s *KongoTestSuite) TestInstance() {
 	s.assert.IsType(new(Kongo), s.client)
 	s.assert.Implements(new(NodeService), s.client.Node)
+	s.assert.Implements(new(ClusterService), s.client.Cluster)
 }
 
 func (s *KongoTestSuite) TestCallApiWithoutRequestUrl() {
