@@ -1,6 +1,7 @@
 package kongo
 
 import (
+	"fmt"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 	"net/http"
@@ -41,6 +42,7 @@ func (s *KongoTestSuite) TestInstance() {
 	s.assert.IsType(new(Kongo), s.client)
 	s.assert.Implements(new(NodeService), s.client.Node)
 	s.assert.Implements(new(ClusterService), s.client.Cluster)
+	s.assert.Implements(new(ConsumersService), s.client.Consumers)
 }
 
 func (s *KongoTestSuite) TestCallApiWithoutRequestUrl() {
@@ -52,11 +54,17 @@ func (s *KongoTestSuite) TestCallApiWithoutRequestUrl() {
 }
 
 func (s *KongoTestSuite) TestCallApiWithoutValueInterface() {
-	req, _ := s.client.NewRequest("GET", "/t")
+	s.mux.HandleFunc("/test", func(w http.ResponseWriter, r *http.Request) {
+		s.assert.Equal("GET", r.Method)
+
+		fmt.Fprint(w, "")
+	})
+
+	req, _ := s.client.NewRequest("GET", "/t", nil)
 	res, err := s.client.Do(req, nil)
 
-	s.assert.Nil(res)
-	s.assert.Error(err)
+	s.assert.IsType(&http.Response{}, res)
+	s.assert.Nil(err)
 }
 
 func TestKongoTestSuite(t *testing.T) {

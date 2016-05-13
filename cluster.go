@@ -26,7 +26,7 @@ type ClusterNode struct {
 func (n *ClusterServiceOp) Status() (*ClusterStatus, *http.Response, error) {
 	resource := "/cluster"
 
-	req, err := n.client.NewRequest("GET", resource)
+	req, err := n.client.NewRequest("GET", resource, nil)
 
 	if err != nil {
 		return nil, nil, err

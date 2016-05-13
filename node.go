@@ -155,7 +155,7 @@ type NodeStatusServer struct {
 func (n *NodeServiceOp) Info() (*NodeInfo, *http.Response, error) {
 	resource := "/"
 
-	req, err := n.client.NewRequest("GET", resource)
+	req, err := n.client.NewRequest("GET", resource, nil)
 
 	if err != nil {
 		return nil, nil, err
@@ -175,7 +175,7 @@ func (n *NodeServiceOp) Info() (*NodeInfo, *http.Response, error) {
 func (n *NodeServiceOp) Status() (*NodeStatus, *http.Response, error) {
 	resource := "/status"
 
-	req, err := n.client.NewRequest("GET", resource)
+	req, err := n.client.NewRequest("GET", resource, nil)
 
 	if err != nil {
 		return nil, nil, err

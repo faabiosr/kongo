@@ -1,6 +1,7 @@
 package kongo
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"net/http"
@@ -10,8 +11,9 @@ type Kongo struct {
 	client  *http.Client
 	baseUrl string
 
-	Node    NodeService
-	Cluster ClusterService
+	Node      NodeService
+	Cluster   ClusterService
+	Consumers ConsumersService
 }
 
 func New(url string) (*Kongo, error) {
@@ -22,14 +24,23 @@ func New(url string) (*Kongo, error) {
 	k := &Kongo{client: http.DefaultClient, baseUrl: url}
 	k.Node = &NodeServiceOp{client: k}
 	k.Cluster = &ClusterServiceOp{client: k}
+	k.Consumers = &ConsumersServiceOp{client: k}
 
 	return k, nil
 }
 
-func (k *Kongo) NewRequest(method string, resource string) (*http.Request, error) {
+func (k *Kongo) NewRequest(method string, resource string, body interface{}) (*http.Request, error) {
 	url := k.baseUrl + resource
 
-	req, err := http.NewRequest(method, url, nil)
+	buf := new(bytes.Buffer)
+	if body != nil {
+		err := json.NewEncoder(buf).Encode(body)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	req, err := http.NewRequest(method, url, buf)
 
 	if err != nil {
 		return nil, err
@@ -48,7 +59,7 @@ func (k *Kongo) Do(req *http.Request, value interface{}) (*http.Response, error)
 	defer res.Body.Close()
 
 	if value == nil {
-		return nil, errors.New("Value parameter is required")
+		return res, nil
 	}
 
 	err = json.NewDecoder(res.Body).Decode(value)
