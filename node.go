@@ -5,127 +5,127 @@ import (
 )
 
 type NodeService interface {
-	Info() (*NodeInfo, *http.Response, error)
-	Status() (*NodeStatus, *http.Response, error)
+	Info() (*Info, *http.Response, error)
+	Status() (*Status, *http.Response, error)
 }
 
 type NodeServiceOp struct {
 	client *Kongo
 }
 
-type NodeInfo struct {
-	Configuration *NodeInfoConfiguration `json:"configuration"`
-	Hostname      string                 `json:"hostname"`
-	LuaVersion    string                 `json:"lua_version"`
-	Plugins       *NodeInfoPlugins       `json:"plugins"`
-	Tagline       string                 `json:"tagline"`
-	Timers        *NodeInfoTimers        `json:"timers"`
-	Version       string                 `json:"version"`
+type Info struct {
+	Configuration *Configuration `json:"configuration, omitempty"`
+	Hostname      string         `json:"hostname, omitempty"`
+	LuaVersion    string         `json:"lua_version, omitempty"`
+	Plugins       *Plugins       `json:"plugins, omitempty"`
+	Tagline       string         `json:"tagline, omitempty"`
+	Timers        *Timers        `json:"timers, omitempty"`
+	Version       string         `json:"version, omitempty"`
 }
 
-type NodeInfoConfiguration struct {
-	AdminApiListen        string                                      `json:"admin_api_listen"`
-	Cassandra             *NodeInfoConfigurationCassandra             `json:"cassandra"`
-	Cluster               *NodeInfoConfigurationCluster               `json:"cluster"`
-	ClusterListen         string                                      `json:"cluster_listen"`
-	ClusterListenRpc      string                                      `json:"cluster_listen_rpc"`
-	CustomPlugins         *NodeInfoConfigurationCustomPlugins         `json:"custom_plugins"`
-	DaoConfig             *NodeInfoConfigurationDaoConfig             `json:"dao_config"`
-	Database              string                                      `json:"database"`
-	DnsResolver           *NodeInfoConfigurationDnsResolver           `json:"dns_resolver"`
-	DnsResolversAvailable *NodeInfoConfigurationDnsResolversAvailable `json:"dns_resolvers_available"`
-	MemoryCacheSize       int                                         `json:"memory_cache_size"`
-	Nginx                 string                                      `json:"nginx"`
-	NginxWorkingDir       string                                      `json:"nginx_working_dir"`
-	Pidfile               string                                      `json:"pid_file"`
-	Plugins               []string                                    `json:"plugins"`
-	Postgres              *NodeInfoConfigurationPostgres              `json:"postgres"`
-	ProxyListen           string                                      `json:"proxy_listen"`
-	ProxyListenSsl        string                                      `json:"proxy_listen_ssl"`
-	SendAnonymousReports  bool                                        `json:"send_anonymous_reports"`
+type Configuration struct {
+	AdminApiListen        string                 `json:"admin_api_listen, omitempty"`
+	Cassandra             *Cassandra             `json:"cassandra, omitempty"`
+	Cluster               *Cluster               `json:"cluster, omitempty"`
+	ClusterListen         string                 `json:"cluster_listen, omitempty"`
+	ClusterListenRpc      string                 `json:"cluster_listen_rpc, omitempty"`
+	CustomPlugins         *CustomPlugins         `json:"custom_plugins, omitempty"`
+	DaoConfig             *DaoConfig             `json:"dao_config, omitempty"`
+	Database              string                 `json:"database, omitempty"`
+	DnsResolver           *DnsResolver           `json:"dns_resolver, omitempty"`
+	DnsResolversAvailable *DnsResolversAvailable `json:"dns_resolvers_available, omitempty"`
+	MemoryCacheSize       int                    `json:"memory_cache_size, omitempty"`
+	Nginx                 string                 `json:"nginx, omitempty"`
+	NginxWorkingDir       string                 `json:"nginx_working_dir, omitempty"`
+	Pidfile               string                 `json:"pid_file, omitempty"`
+	Plugins               []string               `json:"plugins, omitempty"`
+	Postgres              *Postgres              `json:"postgres, omitempty"`
+	ProxyListen           string                 `json:"proxy_listen, omitempty"`
+	ProxyListenSsl        string                 `json:"proxy_listen_ssl, omitempty"`
+	SendAnonymousReports  bool                   `json:"send_anonymous_reports, omitempty"`
 }
 
-type NodeInfoConfigurationCassandra struct {
-	Consistency         string                                     `json:"consistency"`
-	ContactPoints       []string                                   `json:"contact_points"`
-	DataCenters         *NodeInfoConfigurationCassandraDataCenters `json:"data_centers"`
-	Keyspace            string                                     `json:"keyspace"`
-	Port                int                                        `json:"port"`
-	ReplicationFactor   int                                        `json:"replication_factor"`
-	ReplicationStrategy string                                     `json:"replication_strategy"`
-	Ssl                 *NodeInfoConfigurationCassandraSsl         `json:"ssl"`
-	Timeout             int                                        `json:"timeout"`
+type Cassandra struct {
+	Consistency         string       `json:"consistency, omitempty"`
+	ContactPoints       []string     `json:"contact_points, omitempty"`
+	DataCenters         *DataCenters `json:"data_centers, omitempty"`
+	Keyspace            string       `json:"keyspace, omitempty"`
+	Port                int          `json:"port, omitempty"`
+	ReplicationFactor   int          `json:"replication_factor, omitempty"`
+	ReplicationStrategy string       `json:"replication_strategy, omitempty"`
+	Ssl                 *Ssl         `json:"ssl, omitempty"`
+	Timeout             int          `json:"timeout, omitempty"`
 }
 
-type NodeInfoConfigurationCassandraDataCenters struct {
+type DataCenters struct {
 }
 
-type NodeInfoConfigurationCassandraSsl struct {
-	Enabled bool `json:"enabled"`
-	Verify  bool `json:"verify"`
+type Ssl struct {
+	Enabled bool `json:"enabled, omitempty"`
+	Verify  bool `json:"verify, omitempty"`
 }
 
-type NodeInfoConfigurationCluster struct {
-	AutoJoin     bool   `json:"auto-join"`
-	Profile      string `json:"profile"`
-	TtlOnFailure int    `json:"ttl_on_failure"`
+type Cluster struct {
+	AutoJoin     bool   `json:"auto-join, omitempty"`
+	Profile      string `json:"profile, omitempty"`
+	TtlOnFailure int    `json:"ttl_on_failure, omitempty"`
 }
 
-type NodeInfoConfigurationCustomPlugins struct {
+type CustomPlugins struct {
 }
 
-type NodeInfoConfigurationDaoConfig struct {
-	Database string `json:"database"`
-	Host     string `json:"host"`
-	Port     int    `json:"port"`
-	User     string `json:"user"`
+type DaoConfig struct {
+	Database string `json:"database, omitempty"`
+	Host     string `json:"host, omitempty"`
+	Port     int    `json:"port, omitempty"`
+	User     string `json:"user, omitempty"`
 }
 
-type NodeInfoConfigurationDnsResolver struct {
-	Address string `json:"address"`
-	DnsMasq bool   `json:"dnsmasq"`
-	Port    int    `json:"port"`
+type DnsResolver struct {
+	Address string `json:"address, omitempty"`
+	DnsMasq bool   `json:"dnsmasq, omitempty"`
+	Port    int    `json:"port, omitempty"`
 }
 
-type NodeInfoConfigurationDnsResolversAvailable struct {
-	DnsMasq *NodeInfoConfigurationDnsResolversAvailableDnsMasq `json:"dnsmasq"`
-	Server  *NodeInfoConfigurationDnsResolversAvailableServer  `json:"server"`
+type DnsResolversAvailable struct {
+	DnsMasq *DnsResolversAvailableDnsMasq `json:"dnsmasq, omitempty"`
+	Server  *DnsResolversAvailableServer  `json:"server, omitempty"`
 }
 
-type NodeInfoConfigurationDnsResolversAvailableDnsMasq struct {
-	Port int `json:"port"`
+type DnsResolversAvailableDnsMasq struct {
+	Port int `json:"port, omitempty"`
 }
 
-type NodeInfoConfigurationDnsResolversAvailableServer struct {
-	Address string `json:"address"`
+type DnsResolversAvailableServer struct {
+	Address string `json:"address, omitempty"`
 }
 
-type NodeInfoConfigurationPostgres struct {
-	Database string `json:"database"`
-	Host     string `json:"host"`
-	Port     int    `json:"port"`
-	User     string `json:"user"`
+type Postgres struct {
+	Database string `json:"database, omitempty"`
+	Host     string `json:"host, omitempty"`
+	Port     int    `json:"port, omitempty"`
+	User     string `json:"user, omitempty"`
 }
 
-type NodeInfoPlugins struct {
-	AvailableOnServer []string                        `json:"available_on_server"`
-	EnableInCluster   *NodeInfoPluginsEnableInCluster `json:"enable_in_cluster"`
+type Plugins struct {
+	AvailableOnServer []string         `json:"available_on_server, omitempty"`
+	EnableInCluster   *EnableInCluster `json:"enable_in_cluster, omitempty"`
 }
 
-type NodeInfoPluginsEnableInCluster struct {
+type EnableInCluster struct {
 }
 
-type NodeInfoTimers struct {
-	Pending int `json:"pending"`
-	Running int `json:"running"`
+type Timers struct {
+	Pending int `json:"pending, omitempty"`
+	Running int `json:"running, omitempty"`
 }
 
-type NodeStatus struct {
-	Server   *NodeStatusServer   `json:"server"`
-	Database *NodeStatusDatabase `json:"database"`
+type Status struct {
+	Server   *StatusServer   `json:"server, omitempty"`
+	Database *StatusDatabase `json:"database, omitempty"`
 }
 
-type NodeStatusDatabase struct {
+type StatusDatabase struct {
 	Acls                        int `json:"acls, omitempty"`
 	Apis                        int `json:"apis, omitempty"`
 	BasicAuthCredentials        int `json:"basicauth_credentials, omitempty"`
@@ -142,7 +142,7 @@ type NodeStatusDatabase struct {
 	ResponseRateLimitingMetrics int `json:"response_ratelimiting_metrics, omitempty"`
 }
 
-type NodeStatusServer struct {
+type StatusServer struct {
 	ConnectionsAccepted int `json:"connections_accepted, omitempty"`
 	ConnectionsActive   int `json:"connections_active, omitempty"`
 	ConnectionsHandled  int `json:"connections_handled, omitempty"`
@@ -152,7 +152,7 @@ type NodeStatusServer struct {
 	TotalRequests       int `json:"total_requests, omitempty"`
 }
 
-func (n *NodeServiceOp) Info() (*NodeInfo, *http.Response, error) {
+func (n *NodeServiceOp) Info() (*Info, *http.Response, error) {
 	resource := "/"
 
 	req, err := n.client.NewRequest("GET", resource, nil)
@@ -161,18 +161,18 @@ func (n *NodeServiceOp) Info() (*NodeInfo, *http.Response, error) {
 		return nil, nil, err
 	}
 
-	nodeInfo := new(NodeInfo)
+	info := new(Info)
 
-	res, err := n.client.Do(req, nodeInfo)
+	res, err := n.client.Do(req, info)
 
 	if err != nil {
 		return nil, res, err
 	}
 
-	return nodeInfo, res, nil
+	return info, res, nil
 }
 
-func (n *NodeServiceOp) Status() (*NodeStatus, *http.Response, error) {
+func (n *NodeServiceOp) Status() (*Status, *http.Response, error) {
 	resource := "/status"
 
 	req, err := n.client.NewRequest("GET", resource, nil)
@@ -181,13 +181,13 @@ func (n *NodeServiceOp) Status() (*NodeStatus, *http.Response, error) {
 		return nil, nil, err
 	}
 
-	nodeStatus := new(NodeStatus)
+	status := new(Status)
 
-	res, err := n.client.Do(req, nodeStatus)
+	res, err := n.client.Do(req, status)
 
 	if err != nil {
 		return nil, res, err
 	}
 
-	return nodeStatus, res, nil
+	return status, res, nil
 }

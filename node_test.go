@@ -120,14 +120,14 @@ func (s *NodeTestSuite) TestInfo() {
 
 	info, res, err := s.client.Node.Info()
 
-	s.assert.IsType(&NodeInfo{}, info)
+	s.assert.IsType(&Info{}, info)
 	s.assert.IsType(&http.Response{}, res)
 	s.assert.Nil(err)
 
 	s.assert.Equal("0.0.0.0:8001", info.Configuration.AdminApiListen)
 	s.assert.Equal("ONE", info.Configuration.Cassandra.Consistency)
 	s.assert.Equal([]string{"kong-database:9042"}, info.Configuration.Cassandra.ContactPoints)
-	s.assert.IsType(&NodeInfoConfigurationCassandraDataCenters{}, info.Configuration.Cassandra.DataCenters)
+	s.assert.IsType(&DataCenters{}, info.Configuration.Cassandra.DataCenters)
 	s.assert.Equal("kong", info.Configuration.Cassandra.Keyspace)
 	s.assert.Equal(9042, info.Configuration.Cassandra.Port)
 	s.assert.Equal(1, info.Configuration.Cassandra.ReplicationFactor)
@@ -140,7 +140,7 @@ func (s *NodeTestSuite) TestInfo() {
 	s.assert.Equal(3600, info.Configuration.Cluster.TtlOnFailure)
 	s.assert.Equal("0.0.0.0:7946", info.Configuration.ClusterListen)
 	s.assert.Equal("127.0.0.1:7373", info.Configuration.ClusterListenRpc)
-	s.assert.IsType(&NodeInfoConfigurationCustomPlugins{}, info.Configuration.CustomPlugins)
+	s.assert.IsType(&CustomPlugins{}, info.Configuration.CustomPlugins)
 	s.assert.Equal("kong", info.Configuration.DaoConfig.Database)
 	s.assert.Equal("kong-database", info.Configuration.DaoConfig.Host)
 	s.assert.Equal(5432, info.Configuration.DaoConfig.Port)
@@ -166,7 +166,7 @@ func (s *NodeTestSuite) TestInfo() {
 	s.assert.Equal("dd90b6072768", info.Hostname)
 	s.assert.Equal("LuaJIT 2.1.0-beta1", info.LuaVersion)
 	s.assert.Equal([]string{"rate-limiting"}, info.Plugins.AvailableOnServer)
-	s.assert.IsType(&NodeInfoPluginsEnableInCluster{}, info.Plugins.EnableInCluster)
+	s.assert.IsType(&EnableInCluster{}, info.Plugins.EnableInCluster)
 	s.assert.Equal("Welcome to kong", info.Tagline)
 	s.assert.Equal(4, info.Timers.Pending)
 	s.assert.Equal(0, info.Timers.Running)
@@ -230,7 +230,7 @@ func (s *NodeTestSuite) TestStatus() {
 
 	status, res, err := s.client.Node.Status()
 
-	s.assert.IsType(&NodeStatus{}, status)
+	s.assert.IsType(&Status{}, status)
 	s.assert.IsType(&http.Response{}, res)
 	s.assert.Nil(err)
 
