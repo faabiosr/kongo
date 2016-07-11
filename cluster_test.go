@@ -62,6 +62,30 @@ func (s *ClusterTestSuite) TestStatus() {
 	s.assert.Equal(1, status.Total)
 }
 
+func (s *ClusterTestSuite) TestDeleteShouldRetrieveErrorWhenCreateRequest() {
+	client := &Kongo{baseUrl: "%a"}
+	cluster := &ClusterServiceOp{client}
+
+	res, err := cluster.Delete("9a")
+
+	s.assert.Nil(res)
+	s.assert.Error(err)
+}
+
+func (s *ClusterTestSuite) TestDelete() {
+	s.mux.HandleFunc("/cluster/7cad3ed8f8bc_0.0.0.0:7946_8d7cfba508144a5c9c471cf3b5e4ecc3", func(w http.ResponseWriter, r *http.Request) {
+		s.assert.Equal("DELETE", r.Method)
+
+		w.WriteHeader(http.StatusNoContent)
+		fmt.Fprint(w, "")
+	})
+
+	res, err := s.client.Cluster.Delete("7cad3ed8f8bc_0.0.0.0:7946_8d7cfba508144a5c9c471cf3b5e4ecc3")
+
+	s.assert.IsType(&http.Response{}, res)
+	s.assert.Nil(err)
+}
+
 func TestClusterTestSuite(t *testing.T) {
 	suite.Run(t, new(ClusterTestSuite))
 }

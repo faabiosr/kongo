@@ -6,6 +6,7 @@ import (
 
 type ClusterService interface {
 	Status() (*ClusterStatus, *http.Response, error)
+	Delete(name string) (*http.Response, error)
 }
 
 type ClusterServiceOp struct {
@@ -23,10 +24,10 @@ type ClusterNode struct {
 	Status  string `json:"status, omitempty"`
 }
 
-func (n *ClusterServiceOp) Status() (*ClusterStatus, *http.Response, error) {
+func (c *ClusterServiceOp) Status() (*ClusterStatus, *http.Response, error) {
 	resource := "/cluster"
 
-	req, err := n.client.NewRequest("GET", resource, nil)
+	req, err := c.client.NewRequest("GET", resource, nil)
 
 	if err != nil {
 		return nil, nil, err
@@ -34,11 +35,25 @@ func (n *ClusterServiceOp) Status() (*ClusterStatus, *http.Response, error) {
 
 	clusterStatus := new(ClusterStatus)
 
-	res, err := n.client.Do(req, clusterStatus)
+	res, err := c.client.Do(req, clusterStatus)
 
 	if err != nil {
 		return nil, res, err
 	}
 
 	return clusterStatus, res, nil
+}
+
+func (c *ClusterServiceOp) Delete(name string) (*http.Response, error) {
+	resource := "/cluster/" + name
+
+	req, err := c.client.NewRequest("DELETE", resource, nil)
+
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := c.client.Do(req, nil)
+
+	return res, err
 }
