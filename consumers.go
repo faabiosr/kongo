@@ -16,15 +16,16 @@ type ConsumersServiceOp struct {
 }
 
 type ConsumersList struct {
-	Consumers []Consumer `json:"data, omitempty"`
-	Total     int        `json:"total, omitempty"`
+	Consumers []Consumer `json:"data,omitempty"`
+	Total     int        `json:"total,omitempty"`
+	Next      string     `json:"next,omitempty"`
 }
 
 type Consumer struct {
-	CreatedAt int    `json:"created_at, omitempty"`
-	CustomId  string `json:"custom_id, omitempty"`
-	Id        string `json:"id, omitempty"`
-	Username  string `json:"username, omitempty"`
+	CreatedAt int    `json:"created_at,omitempty"`
+	CustomId  string `json:"custom_id,omitempty"`
+	Id        string `json:"id,omitempty"`
+	Username  string `json:"username,omitempty"`
 }
 
 func (c *ConsumersServiceOp) List() (*ConsumersList, *http.Response, error) {

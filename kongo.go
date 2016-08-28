@@ -46,6 +46,9 @@ func (k *Kongo) NewRequest(method string, resource string, body interface{}) (*h
 		return nil, err
 	}
 
+	req.Header.Add("Content-Type", "application/json")
+	req.Header.Add("Accept", "application/json")
+
 	return req, nil
 }
 

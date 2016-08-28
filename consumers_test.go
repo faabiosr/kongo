@@ -134,6 +134,27 @@ func (s *ConsumersTestSuite) TestDelete() {
 	s.assert.Nil(err)
 }
 
+func (s *ConsumersTestSuite) TestCreateShouldRetrieveErrorWhenCreateRequest() {
+	client := &Kongo{baseUrl: "%a"}
+	consumers := &ConsumersServiceOp{client}
+
+	consumer := &Consumer{CustomId: "9ao2"}
+	_, res, err := consumers.Create(consumer)
+
+	s.assert.Empty(consumer.Id)
+	s.assert.Nil(res)
+	s.assert.Error(err)
+}
+
+func (s *ConsumersTestSuite) TestCreateShouldRetrieveErrorWhenRequest() {
+	consumer := &Consumer{CustomId: "9ao2"}
+	_, res, err := s.client.Consumers.Create(consumer)
+
+	s.assert.Empty(consumer.Id)
+	s.assert.Nil(res)
+	s.assert.Error(err)
+}
+
 func (s *ConsumersTestSuite) TestCreate() {
 	s.mux.HandleFunc("/consumers", func(w http.ResponseWriter, r *http.Request) {
 		s.assert.Equal("POST", r.Method)
