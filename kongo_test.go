@@ -43,6 +43,7 @@ func (s *KongoTestSuite) TestInstance() {
 	s.assert.Implements(new(NodeService), s.client.Node)
 	s.assert.Implements(new(ClusterService), s.client.Cluster)
 	s.assert.Implements(new(ConsumersService), s.client.Consumers)
+	s.assert.Implements(new(ApisService), s.client.Apis)
 }
 
 func (s *KongoTestSuite) TestCallApiWithoutRequestUrl() {

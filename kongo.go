@@ -14,6 +14,7 @@ type Kongo struct {
 	Node      NodeService
 	Cluster   ClusterService
 	Consumers ConsumersService
+	Apis      ApisService
 }
 
 func New(url string) (*Kongo, error) {
@@ -25,6 +26,7 @@ func New(url string) (*Kongo, error) {
 	k.Node = &NodeServiceOp{client: k}
 	k.Cluster = &ClusterServiceOp{client: k}
 	k.Consumers = &ConsumersServiceOp{client: k}
+	k.Apis = &ApisServiceOp{client: k}
 
 	return k, nil
 }
