@@ -1,43 +1,99 @@
 package kongo
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
+	"io/ioutil"
 	"net/http"
+	"net/url"
 )
 
-type Kongo struct {
-	client  *http.Client
-	baseUrl string
+const (
+	version   = "v0"
+	userAgent = "kongo/" + version
+	mediaType = "application/json"
+)
 
-	Node    NodeService
-	Cluster ClusterService
-}
+type (
+	// Kongo manages communication with Kong Admin API.
+	Kongo struct {
 
-func New(url string) (*Kongo, error) {
-	if url == "" {
-		return nil, errors.New("Empty url is not allowed")
+		// HTTP client used to communicate with the Kong Admin API.
+		client *http.Client
+
+		// Kong server base URL.
+		BaseURL *url.URL
+
+		// User agent for client
+		UserAgent string
 	}
 
-	k := &Kongo{client: http.DefaultClient, baseUrl: url}
-	k.Node = &NodeServiceOp{client: k}
-	k.Cluster = &ClusterServiceOp{client: k}
+	// An ErrorResponse report the error caused by and API request
+	ErrorResponse struct {
+		// HTTP response that caused this error
+		Response *http.Response
 
-	return k, nil
+		// Error message based on http status code
+		Message string `json:"message, omitempty"`
+	}
+)
+
+// NewClient returns a new Kongo API client.
+func NewClient(client *http.Client, baseURL *url.URL) (*Kongo, error) {
+	if client == nil {
+		client = http.DefaultClient
+	}
+
+	if baseURL == nil {
+		return nil, errors.New("Empty URL is not allowed")
+	}
+
+	return &Kongo{client, baseURL, userAgent}, nil
 }
 
-func (k *Kongo) NewRequest(method string, resource string) (*http.Request, error) {
-	url := k.baseUrl + resource
+// New returns a new Kongo API client.
+func New(client *http.Client, baseURL string) (*Kongo, error) {
+	if baseURL == "" {
+		return nil, errors.New("Empty URL is not allowed")
+	}
 
-	req, err := http.NewRequest(method, url, nil)
+	parsedURL, err := url.Parse(baseURL)
 
 	if err != nil {
 		return nil, err
 	}
 
+	return NewClient(client, parsedURL)
+}
+
+// NewRequest creates an API requrest. A relative URL can be provided in resource string.
+func (k *Kongo) NewRequest(ctx context.Context, method string, resource string) (*http.Request, error) {
+	res, err := url.Parse(resource)
+
+	if err != nil {
+		return nil, err
+	}
+
+	url := k.BaseURL.ResolveReference(res)
+
+	req, err := http.NewRequest(method, url.String(), nil)
+
+	if err != nil {
+		return nil, err
+	}
+
+	req = req.WithContext(ctx)
+	req.Header.Add("Content-Type", mediaType)
+	req.Header.Add("Accept", mediaType)
+	req.Header.Add("User-Agent", userAgent)
+
 	return req, nil
 }
 
+// Do sends an API request and returns the API response. If the HTTP response is in the 2xx range,
+// unmarshal the response body into value.
 func (k *Kongo) Do(req *http.Request, value interface{}) (*http.Response, error) {
 	res, err := k.client.Do(req)
 
@@ -47,8 +103,14 @@ func (k *Kongo) Do(req *http.Request, value interface{}) (*http.Response, error)
 
 	defer res.Body.Close()
 
+	err = k.checkResponse(res)
+
+	if err != nil {
+		return res, err
+	}
+
 	if value == nil {
-		return nil, errors.New("Value parameter is required")
+		return res, nil
 	}
 
 	err = json.NewDecoder(res.Body).Decode(value)
@@ -58,4 +120,44 @@ func (k *Kongo) Do(req *http.Request, value interface{}) (*http.Response, error)
 	}
 
 	return res, nil
+}
+
+// checkResponse checks the API response for errors and returns them if present.
+func (k *Kongo) checkResponse(res *http.Response) error {
+	if c := res.StatusCode; c >= 200 && c <= 299 {
+		return nil
+	}
+
+	errorResponse := &ErrorResponse{Response: res}
+
+	data, err := ioutil.ReadAll(res.Body)
+
+	if err != nil {
+		return errorResponse
+	}
+
+	if len(data) == 0 {
+		return errorResponse
+	}
+
+	err = json.Unmarshal(data, errorResponse)
+
+	if err != nil {
+		errorResponse.Message = string(data)
+	}
+
+	return errorResponse
+}
+
+// Error retrieves the error message of Error Response
+func (e *ErrorResponse) Error() string {
+	if e.Message == "" {
+		e.Message = "Request error"
+	}
+
+	return fmt.Sprintf(
+		"%d %s",
+		e.Response.StatusCode,
+		e.Message,
+	)
 }
