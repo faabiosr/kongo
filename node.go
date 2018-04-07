@@ -178,7 +178,7 @@ type (
 
 	// NodeStatusDatabase it's a structure of API result
 	NodeStatusDatabase struct {
-		Reachable bool `json:"reachable, omitempty`
+		Reachable bool `json:"reachable, omitempty"`
 	}
 
 	// NodeStatusServer it's a structure of API result
