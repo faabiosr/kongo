@@ -31,7 +31,7 @@ import (
 )
 
 func main() {
-    kongo := kongo.New("127.0.0.1:8001")
+    kongo := kongo.New(nil, "127.0.0.1:8001")
     status := kongo.Node.Status()
     ...
 }

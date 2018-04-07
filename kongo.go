@@ -28,6 +28,9 @@ type (
 
 		// User agent for client
 		UserAgent string
+
+		// Node api service
+		Node Node
 	}
 
 	// An ErrorResponse report the error caused by and API request
@@ -50,7 +53,10 @@ func NewClient(client *http.Client, baseURL *url.URL) (*Kongo, error) {
 		return nil, errors.New("Empty URL is not allowed")
 	}
 
-	return &Kongo{client, baseURL, userAgent}, nil
+	k := &Kongo{client: client, BaseURL: baseURL, UserAgent: userAgent}
+	k.Node = &NodeService{k}
+
+	return k, nil
 }
 
 // New returns a new Kongo API client.

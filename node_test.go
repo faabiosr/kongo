@@ -1,121 +1,167 @@
 package kongo
 
 import (
+	"context"
 	"fmt"
 	"github.com/stretchr/testify/suite"
+	"io"
 	"net/http"
 	"testing"
 )
 
 type NodeTestSuite struct {
-	KongoTestSuite
+	BaseTestSuite
 }
 
-func (s *NodeTestSuite) TestInfoShouldRetrieveErrorWhenCreateRequest() {
-	client := &Kongo{baseUrl: "%a"}
-	node := &NodeServiceOp{client}
+func (s *NodeTestSuite) TestInfoWithContextReturnsHttpError() {
+	s.mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		s.assert.Equal(http.MethodGet, r.Method)
 
-	info, res, err := node.Info()
+		w.WriteHeader(http.StatusBadRequest)
 
-	s.assert.Nil(info)
-	s.assert.Nil(res)
+		fmt.Fprint(w, "")
+	})
+
+	client, _ := New(nil, s.server.URL)
+	_, res, err := client.Node.InfoWithContext(context.TODO())
+
+	s.assert.IsType(&http.Response{}, res)
 	s.assert.Error(err)
 }
 
-func (s *NodeTestSuite) TestInfoShouldRetrieveErrorWhenRequest() {
-	info, res, err := s.client.Node.Info()
+func (s *NodeTestSuite) TestInfoWithContext() {
+	s.mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		s.assert.Equal(http.MethodGet, r.Method)
 
-	s.assert.Nil(info)
-	s.assert.Nil(res)
-	s.assert.Error(err)
+		file, _ := s.LoadFixture("fixtures/info_payload.json")
+
+		io.Copy(w, file)
+
+		defer file.Close()
+	})
+
+	info, res, err := s.client.Node.InfoWithContext(context.TODO())
+
+	s.assert.IsType(&NodeInfo{}, info)
+	s.assert.IsType(&http.Response{}, res)
+	s.assert.Nil(err)
+
+	s.assert.NotZero(info.Plugins.AvailableOnServer)
+	s.assert.NotZero(info.Plugins.EnabledInCluster)
+	s.assert.NotEmpty(info.Tagline)
+	s.assert.NotZero(info.Configuration.Plugins)
+	s.assert.NotZero(info.Configuration.AdminListen)
+	s.assert.NotZero(info.Configuration.LuaSSLVerifyDepth)
+	s.assert.NotZero(info.Configuration.TrustedIps)
+	s.assert.NotEmpty(info.Configuration.Prefix)
+	s.assert.NotEmpty(info.Configuration.NginxConf)
+	s.assert.NotEmpty(info.Configuration.CassandraUsername)
+	s.assert.NotEmpty(info.Configuration.AdminSSLCertificateCsrDefault)
+	s.assert.NotEmpty(info.Configuration.SSLCertificateKey)
+	s.assert.NotZero(info.Configuration.DNSResolver)
+	s.assert.NotEmpty(info.Configuration.PostgresUsername)
+	s.assert.NotEmpty(info.Configuration.MemoryCacheSize)
+	s.assert.NotEmpty(info.Configuration.SSLCiphers)
+	s.assert.NotZero(info.Configuration.CustomPlugins)
+	s.assert.NotEmpty(info.Configuration.PostgresHost)
+	s.assert.NotEmpty(info.Configuration.NginxAccessLogs)
+	s.assert.NotZero(info.Configuration.ProxyListen)
+	s.assert.NotEmpty(info.Configuration.ClientSSLCertificateDefault)
+	s.assert.NotEmpty(info.Configuration.SSLCertificateDefaultKey)
+	s.assert.NotZero(info.Configuration.DatabaseUpdateFrequency)
+	s.assert.Zero(info.Configuration.DatabaseUpdatePropagation)
+	s.assert.NotEmpty(info.Configuration.NginxErrorLogs)
+	s.assert.NotZero(info.Configuration.CassandraPort)
+	s.assert.NotZero(info.Configuration.DNSOrder)
+	s.assert.NotZero(info.Configuration.DNSErrorTTL)
+	s.assert.NotEmpty(info.Configuration.CassandraLBPolicy)
+	s.assert.True(info.Configuration.NginxOptimizations)
+	s.assert.NotEmpty(info.Configuration.Database)
+	s.assert.NotEmpty(info.Configuration.PostgresDatabase)
+	s.assert.NotEmpty(info.Configuration.NginxWorkerProcesses)
+	s.assert.Empty(info.Configuration.LuaPackageCPath)
+	s.assert.NotEmpty(info.Configuration.LuaPackagePath)
+	s.assert.NotEmpty(info.Configuration.NginxPID)
+	s.assert.NotZero(info.Configuration.UpstreamKeepAlive)
+	s.assert.NotEmpty(info.Configuration.AdminAcessLog)
+	s.assert.NotEmpty(info.Configuration.ClientSSLCertificateCsrDefault)
+	s.assert.NotZero(info.Configuration.ProxyListeners, 2)
+	s.assert.False(info.Configuration.ProxyListeners[0].SSL)
+	s.assert.NotEmpty(info.Configuration.ProxyListeners[0].Ip)
+	s.assert.False(info.Configuration.ProxyListeners[0].Protocol)
+	s.assert.NotZero(info.Configuration.ProxyListeners[0].Port)
+	s.assert.False(info.Configuration.ProxyListeners[0].Http2)
+	s.assert.NotEmpty(info.Configuration.ProxyListeners[0].Listener)
+	s.assert.True(info.Configuration.ProxySSLEnabled)
+	s.assert.NotZero(info.Configuration.LuaSocketPoolSize)
+	s.assert.NotEmpty(info.Configuration.ErrorDefaultType)
+	s.assert.NotEmpty(info.Configuration.ProxyAccessLog)
+	s.assert.False(info.Configuration.CassandraSSL)
+	s.assert.NotEmpty(info.Configuration.CassandraConsistency)
+	s.assert.NotEmpty(info.Configuration.ClientMaxBodySize)
+	s.assert.NotEmpty("logs/error.log", info.Configuration.AdminErrorLog)
+	s.assert.NotEmpty("/usr/local/kong/ssl/admin-kong-default.crt", info.Configuration.AdminSSLCertificateDefault)
+	s.assert.NotZero(info.Configuration.DNSNotFoundTTL)
+	s.assert.False(info.Configuration.PostgresSSL)
+	s.assert.NotEmpty("notice", info.Configuration.LogLevel)
+	s.assert.NotZero(info.Configuration.CassandraReplicationFactor)
+	s.assert.NotEmpty("SimpleStrategy", info.Configuration.CassandraReplicationStrategy)
+	s.assert.True(info.Configuration.LatencyTokens)
+	s.assert.NotZero(info.Configuration.CassandraDataCenters)
+	s.assert.NotEmpty("X-Real-IP", info.Configuration.RealIpHeader)
+	s.assert.NotEmpty("/usr/local/kong/ssl/admin-kong-default.key", info.Configuration.AdminSSLCertificateKeyDefault)
+	s.assert.NotEmpty("/usr/local/kong/.kong_env", info.Configuration.KongEnv)
+	s.assert.NotZero(info.Configuration.CassandraSchemaConsensusTimeout)
+	s.assert.NotEmpty("/etc/hosts", info.Configuration.DNSHostsFile)
+	s.assert.NotZero(info.Configuration.AdminListeners)
+	s.assert.False(info.Configuration.AdminListeners[0].SSL)
+	s.assert.NotEmpty("0.0.0.0", info.Configuration.AdminListeners[0].Ip)
+	s.assert.False(info.Configuration.AdminListeners[0].Protocol)
+	s.assert.NotZero(info.Configuration.AdminListeners[0].Port)
+	s.assert.False(info.Configuration.AdminListeners[0].Http2)
+	s.assert.NotEmpty("0.0.0.0:8001", info.Configuration.AdminListeners[0].Listener)
+	s.assert.False(info.Configuration.DNSNoSync)
+	s.assert.NotEmpty("/usr/local/kong/ssl/kong-default.crt", info.Configuration.SSLCertificate)
+	s.assert.False(info.Configuration.ClientSSL)
+	s.assert.NotZero(info.Configuration.CassandraTimeout)
+	s.assert.False(info.Configuration.CassandraSSLVerify)
+	s.assert.NotZero(info.Configuration.CassandraContactPoints)
+	s.assert.True(info.Configuration.ServerTokens)
+	s.assert.NotEmpty("off", info.Configuration.RealIpRecursive)
+	s.assert.NotEmpty("logs/error.log", info.Configuration.ProxyErrorLog)
+	s.assert.NotEmpty("/usr/local/kong/ssl/kong-default.key", info.Configuration.ClientSSLCertificateKeyDefault)
+	s.assert.NotEmpty("off", info.Configuration.NginxDaemon)
+	s.assert.True(info.Configuration.AnonymousReports)
+	s.assert.NotEmpty("modern", info.Configuration.SSLCipherSuite)
+	s.assert.NotZero(info.Configuration.DNSStaleTTL)
+	s.assert.NotZero(info.Configuration.PostgresPort)
+	s.assert.NotEmpty("/usr/local/kong/nginx-kong.conf", info.Configuration.NginxKongConf)
+	s.assert.NotEmpty("8k", info.Configuration.ClientBodyBufferSize)
+	s.assert.NotZero(info.Configuration.DatabaseCacheTTL)
+	s.assert.False(info.Configuration.PostgresSSLVerify)
+	s.assert.NotEmpty("/usr/local/kong/logs/admin_access.log", info.Configuration.NginxAdminAccessLog)
+	s.assert.NotEmpty("kong", info.Configuration.CassandraKeyspace)
+	s.assert.NotEmpty("/usr/local/kong/ssl/kong-default.crt", info.Configuration.SSLCertificateDefault)
+	s.assert.NotEmpty("/usr/local/kong/ssl/kong-default.csr", info.Configuration.SSLCertificateCsrDefault)
+	s.assert.False(info.Configuration.AdminSSLEnabled)
+
+	s.assert.NotEmpty(info.Version)
+	s.assert.NotEmpty(info.LuaVersion)
+	s.assert.NotZero(info.PrngSeeds)
+	s.assert.NotZero(info.Timers.Pending)
+	s.assert.Zero(info.Timers.Running)
+	s.assert.NotEmpty(info.Hostname)
 }
 
 func (s *NodeTestSuite) TestInfo() {
 	s.mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		s.assert.Equal("GET", r.Method)
+		s.assert.Equal(http.MethodGet, r.Method)
 
-		response := `
-		{
-            "configuration": {
-                "admin_api_listen": "0.0.0.0:8001",
-                "cassandra": {
-                    "consistency": "ONE",
-                    "contact_points": [
-                        "kong-database:9042"
-                    ],
-                    "data_centers": {},
-                    "keyspace": "kong",
-                    "port": 9042,
-                    "replication_factor": 1,
-                    "replication_strategy": "SimpleStrategy",
-                    "ssl": {
-                        "enabled": false,
-                        "verify": false
-                    },
-                    "timeout": 5000
-                },
-                "cluster": {
-                    "auto-join": true,
-                    "profile": "wan",
-                    "ttl_on_failure": 3600
-                },
-                "cluster_listen": "0.0.0.0:7946",
-                "cluster_listen_rpc": "127.0.0.1:7373",
-                "custom_plugins": {},
-                "dao_config": {
-                    "database": "kong",
-                    "host": "kong-database",
-                    "port": 5432,
-                    "user": "kong"
-                },
-                "database": "postgres",
-                "dns_resolver": {
-                    "address": "127.0.0.1:8053",
-                    "dnsmasq": true,
-                    "port": 8053
-                },
-                "dns_resolvers_available": {
-                    "dnsmasq": {
-                        "port": 8053
-                    },
-                    "server": {
-                        "address": "8.8.8.8"
-                    }
-                },
-                "memory_cache_size": 128,
-                "nginx": "NGINX CONFIGURATION",
-                "nginx_working_dir": "/usr/local/kong",
-                "pid_file": "/usr/local/kong",
-                "plugins": [
-                    "ssl"
-                ],
-                "postgres": {
-                    "database": "kong",
-                    "host": "kong-database",
-                    "port": 5432,
-                    "user": "kong"
-                },
-                "proxy_listen": "0.0.0.0:8000",
-                "proxy_listen_ssl": "0.0.0.0:8443",
-                "send_anonymous_reports": true
-            },
-            "hostname": "dd90b6072768",
-            "lua_version": "LuaJIT 2.1.0-beta1",
-            "plugins": {
-                "available_on_server": [
-                    "rate-limiting"
-                ],
-                "enabled_in_cluster": {}
-            },
-            "tagline": "Welcome to kong",
-            "timers": {
-                "pending": 4,
-                "running": 0
-            },
-            "version": "0.8.1"
-		}`
+		file, _ := s.LoadFixture("fixtures/info_payload.json")
 
-		fmt.Fprint(w, response)
+		io.Copy(w, file)
+
+		defer file.Close()
 	})
 
 	info, res, err := s.client.Node.Info()
@@ -124,95 +170,73 @@ func (s *NodeTestSuite) TestInfo() {
 	s.assert.IsType(&http.Response{}, res)
 	s.assert.Nil(err)
 
-	s.assert.Equal("0.0.0.0:8001", info.Configuration.AdminApiListen)
-	s.assert.Equal("ONE", info.Configuration.Cassandra.Consistency)
-	s.assert.Equal([]string{"kong-database:9042"}, info.Configuration.Cassandra.ContactPoints)
-	s.assert.IsType(&NodeInfoConfigurationCassandraDataCenters{}, info.Configuration.Cassandra.DataCenters)
-	s.assert.Equal("kong", info.Configuration.Cassandra.Keyspace)
-	s.assert.Equal(9042, info.Configuration.Cassandra.Port)
-	s.assert.Equal(1, info.Configuration.Cassandra.ReplicationFactor)
-	s.assert.Equal("SimpleStrategy", info.Configuration.Cassandra.ReplicationStrategy)
-	s.assert.Equal(false, info.Configuration.Cassandra.Ssl.Enabled)
-	s.assert.Equal(false, info.Configuration.Cassandra.Ssl.Verify)
-	s.assert.Equal(5000, info.Configuration.Cassandra.Timeout)
-	s.assert.Equal(true, info.Configuration.Cluster.AutoJoin)
-	s.assert.Equal("wan", info.Configuration.Cluster.Profile)
-	s.assert.Equal(3600, info.Configuration.Cluster.TtlOnFailure)
-	s.assert.Equal("0.0.0.0:7946", info.Configuration.ClusterListen)
-	s.assert.Equal("127.0.0.1:7373", info.Configuration.ClusterListenRpc)
-	s.assert.IsType(&NodeInfoConfigurationCustomPlugins{}, info.Configuration.CustomPlugins)
-	s.assert.Equal("kong", info.Configuration.DaoConfig.Database)
-	s.assert.Equal("kong-database", info.Configuration.DaoConfig.Host)
-	s.assert.Equal(5432, info.Configuration.DaoConfig.Port)
-	s.assert.Equal("kong", info.Configuration.DaoConfig.User)
-	s.assert.Equal("postgres", info.Configuration.Database)
-	s.assert.Equal("127.0.0.1:8053", info.Configuration.DnsResolver.Address)
-	s.assert.Equal(true, info.Configuration.DnsResolver.DnsMasq)
-	s.assert.Equal(8053, info.Configuration.DnsResolver.Port)
-	s.assert.Equal(8053, info.Configuration.DnsResolversAvailable.DnsMasq.Port)
-	s.assert.Equal("8.8.8.8", info.Configuration.DnsResolversAvailable.Server.Address)
-	s.assert.Equal(128, info.Configuration.MemoryCacheSize)
-	s.assert.Equal("NGINX CONFIGURATION", info.Configuration.Nginx)
-	s.assert.Equal("/usr/local/kong", info.Configuration.NginxWorkingDir)
-	s.assert.Equal("/usr/local/kong", info.Configuration.Pidfile)
-	s.assert.Equal([]string{"ssl"}, info.Configuration.Plugins)
-	s.assert.Equal("kong", info.Configuration.Postgres.Database)
-	s.assert.Equal("kong-database", info.Configuration.Postgres.Host)
-	s.assert.Equal(5432, info.Configuration.Postgres.Port)
-	s.assert.Equal("kong", info.Configuration.Postgres.User)
-	s.assert.Equal("0.0.0.0:8000", info.Configuration.ProxyListen)
-	s.assert.Equal("0.0.0.0:8443", info.Configuration.ProxyListenSsl)
-	s.assert.Equal(true, info.Configuration.SendAnonymousReports)
-	s.assert.Equal("dd90b6072768", info.Hostname)
-	s.assert.Equal("LuaJIT 2.1.0-beta1", info.LuaVersion)
-	s.assert.Equal([]string{"rate-limiting"}, info.Plugins.AvailableOnServer)
-	s.assert.IsType(&NodeInfoPluginsEnableInCluster{}, info.Plugins.EnableInCluster)
-	s.assert.Equal("Welcome to kong", info.Tagline)
-	s.assert.Equal(4, info.Timers.Pending)
-	s.assert.Equal(0, info.Timers.Running)
-	s.assert.Equal("0.8.1", info.Version)
+	s.assert.NotEmpty(info.Version)
 }
 
-func (s *NodeTestSuite) TestStatusShouldRetrieveErrorWhenCreateRequest() {
-	client := &Kongo{baseUrl: "%a"}
-	node := &NodeServiceOp{client}
-
-	status, res, err := node.Status()
-
-	s.assert.Nil(status)
-	s.assert.Nil(res)
-	s.assert.Error(err)
-}
-
-func (s *NodeTestSuite) TestStatusShouldRetrieveErrorWhenRequest() {
-	status, res, err := s.client.Node.Status()
-
-	s.assert.Nil(status)
-	s.assert.Nil(res)
-	s.assert.Error(err)
-}
-
-func (s *NodeTestSuite) TestStatus() {
+func (s *NodeTestSuite) TestStatusWithContextReturnsHttpError() {
 	s.mux.HandleFunc("/status", func(w http.ResponseWriter, r *http.Request) {
-		s.assert.Equal("GET", r.Method)
+		s.assert.Equal(http.MethodGet, r.Method)
+
+		w.WriteHeader(http.StatusBadRequest)
+
+		fmt.Fprint(w, "")
+	})
+
+	client, _ := New(nil, s.server.URL)
+	_, res, err := client.Node.StatusWithContext(context.TODO())
+
+	s.assert.IsType(&http.Response{}, res)
+	s.assert.Error(err)
+}
+
+func (s *NodeTestSuite) TestStatusWithContext() {
+	s.mux.HandleFunc("/status", func(w http.ResponseWriter, r *http.Request) {
+		s.assert.Equal(http.MethodGet, r.Method)
 
 		response := `
 		{
             "database": {
-                "acls": 0,
-                "apis": 0,
-                "basicauth_credentials": 0,
-                "consumers": 0,
-                "hmacauth_credentials": 0,
-                "jwt_secrets": 0,
-                "keyauth_credentials": 0,
-                "nodes": 1,
-                "oauth2_authorization_codes": 0,
-                "oauth2_credentials": 0,
-                "oauth2_tokens": 0,
-                "plugins": 0,
-                "ratelimiting_metrics": 0,
-                "response_ratelimiting_metrics": 0
+                "reachable": true
+            },
+            "server": {
+                "connections_accepted": 532,
+                "connections_active": 1,
+                "connections_handled": 532,
+                "connections_reading": 0,
+                "connections_waiting": 0,
+                "connections_writing": 1,
+                "total_requests": 532
+            }
+		}`
+
+		fmt.Fprint(w, response)
+	})
+
+	status, res, err := s.client.Node.StatusWithContext(context.TODO())
+
+	s.assert.IsType(&NodeStatus{}, status)
+	s.assert.IsType(&http.Response{}, res)
+	s.assert.Nil(err)
+
+	s.assert.NotZero(status.Server.ConnectionsAccepted)
+	s.assert.NotZero(status.Server.ConnectionsActive)
+	s.assert.NotZero(status.Server.ConnectionsHandled)
+	s.assert.Zero(status.Server.ConnectionsReading)
+	s.assert.Zero(status.Server.ConnectionsWaiting)
+	s.assert.NotZero(status.Server.ConnectionsWriting)
+	s.assert.NotZero(status.Server.TotalRequests)
+
+	s.assert.True(status.Database.Reachable)
+}
+
+func (s *NodeTestSuite) TestStatus() {
+	s.mux.HandleFunc("/status", func(w http.ResponseWriter, r *http.Request) {
+		s.assert.Equal(http.MethodGet, r.Method)
+
+		response := `
+		{
+            "database": {
+                "reachable": true
             },
             "server": {
                 "connections_accepted": 532,
@@ -234,28 +258,15 @@ func (s *NodeTestSuite) TestStatus() {
 	s.assert.IsType(&http.Response{}, res)
 	s.assert.Nil(err)
 
-	s.assert.Equal(532, status.Server.ConnectionsAccepted)
-	s.assert.Equal(1, status.Server.ConnectionsActive)
-	s.assert.Equal(532, status.Server.ConnectionsHandled)
-	s.assert.Equal(0, status.Server.ConnectionsReading)
-	s.assert.Equal(0, status.Server.ConnectionsWaiting)
-	s.assert.Equal(1, status.Server.ConnectionsWriting)
-	s.assert.Equal(532, status.Server.TotalRequests)
+	s.assert.NotZero(status.Server.ConnectionsAccepted)
+	s.assert.NotZero(status.Server.ConnectionsActive)
+	s.assert.NotZero(status.Server.ConnectionsHandled)
+	s.assert.Zero(status.Server.ConnectionsReading)
+	s.assert.Zero(status.Server.ConnectionsWaiting)
+	s.assert.NotZero(status.Server.ConnectionsWriting)
+	s.assert.NotZero(status.Server.TotalRequests)
 
-	s.assert.Equal(0, status.Database.Acls)
-	s.assert.Equal(0, status.Database.Apis)
-	s.assert.Equal(0, status.Database.BasicAuthCredentials)
-	s.assert.Equal(0, status.Database.Consumers)
-	s.assert.Equal(0, status.Database.HmacAuthCredentials)
-	s.assert.Equal(0, status.Database.JwtSecrets)
-	s.assert.Equal(0, status.Database.KeyAuthCredentials)
-	s.assert.Equal(1, status.Database.Nodes)
-	s.assert.Equal(0, status.Database.Oauth2AuthorizationCodes)
-	s.assert.Equal(0, status.Database.Oauth2Credentials)
-	s.assert.Equal(0, status.Database.Oauth2Tokens)
-	s.assert.Equal(0, status.Database.Plugins)
-	s.assert.Equal(0, status.Database.RateLimitingMetrics)
-	s.assert.Equal(0, status.Database.ResponseRateLimitingMetrics)
+	s.assert.True(status.Database.Reachable)
 }
 
 func TestNodeTestSuite(t *testing.T) {

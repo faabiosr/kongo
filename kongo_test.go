@@ -5,14 +5,17 @@ import (
 	"fmt"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"os"
+	"path/filepath"
 	"testing"
 )
 
 type (
-	KongoTestSuite struct {
+	BaseTestSuite struct {
 		suite.Suite
 
 		assert  *assert.Assertions
@@ -22,9 +25,13 @@ type (
 		mux    *http.ServeMux
 		server *httptest.Server
 	}
+
+	KongoTestSuite struct {
+		BaseTestSuite
+	}
 )
 
-func (s *KongoTestSuite) SetupTest() {
+func (s *BaseTestSuite) SetupTest() {
 	s.mux = http.NewServeMux()
 	s.server = httptest.NewServer(s.mux)
 
@@ -34,8 +41,24 @@ func (s *KongoTestSuite) SetupTest() {
 	s.assert = assert.New(s.T())
 }
 
-func (s *KongoTestSuite) TearDownTest() {
+func (s *BaseTestSuite) TearDownTest() {
 	s.server.Close()
+}
+
+func (s *BaseTestSuite) LoadFixture(filePath string) (io.ReadCloser, error) {
+	filename, err := filepath.Abs(filePath)
+
+	if err != nil {
+		return nil, err
+	}
+
+	file, err := os.Open(filename)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return file, nil
 }
 
 func (s *KongoTestSuite) TestFactoryClientWithEmptyURL() {
@@ -59,6 +82,7 @@ func (s *KongoTestSuite) TestFactoryWithInvalidURL() {
 func (s *KongoTestSuite) TestInstance() {
 	s.assert.IsType(new(Kongo), s.client)
 	s.assert.Equal(userAgent, s.client.UserAgent)
+	s.assert.Implements(new(Node), s.client.Node)
 }
 
 func (s *KongoTestSuite) TestCreateRequestWithInvalidResourcePath() {
@@ -88,7 +112,7 @@ func (s *KongoTestSuite) TestCreateRequest() {
 }
 
 func (s *KongoTestSuite) TestCallApiWithoutRequestUrl() {
-	req, _ := http.NewRequest("GET", "", nil)
+	req, _ := http.NewRequest(http.MethodGet, "", nil)
 	res, err := s.client.Do(req, nil)
 
 	s.assert.Nil(res)
@@ -113,11 +137,13 @@ func (s *KongoTestSuite) TestCallApiResourceWithWrongValueJsonStruct() {
 	s.mux.HandleFunc("/status", func(w http.ResponseWriter, r *http.Request) {
 		s.assert.Equal(http.MethodGet, r.Method)
 
-		fmt.Fprint(w, `{"status": true}`)
+		fmt.Fprint(w, `{"database": {"reachable": true}}`)
 	})
 
 	v := struct {
-		Status string `json:"status"`
+		Database struct {
+			Reachable string `json:"reachable"`
+		} `json:"database"`
 	}{}
 
 	req, _ := s.client.NewRequest(context.TODO(), http.MethodGet, "/status")
@@ -129,34 +155,34 @@ func (s *KongoTestSuite) TestCallApiResourceWithWrongValueJsonStruct() {
 
 func (s *KongoTestSuite) TestCallApiWhenReturnsHttpErrors() {
 	s.mux.HandleFunc("/status", func(w http.ResponseWriter, r *http.Request) {
-		s.assert.Equal(http.MethodGet, r.Method)
+		s.assert.Equal(http.MethodPost, r.Method)
 
-		w.WriteHeader(http.StatusBadRequest)
+		w.WriteHeader(http.StatusMethodNotAllowed)
 
-		fmt.Fprint(w, `{"message": "Wrong data"}`)
+		fmt.Fprint(w, `{"message": "Method not allowed"}`)
 	})
 
-	req, _ := s.client.NewRequest(context.TODO(), http.MethodGet, "/status")
+	req, _ := s.client.NewRequest(context.TODO(), http.MethodPost, "/status")
 	res, err := s.client.Do(req, nil)
 
 	s.assert.NotNil(res)
-	s.assert.EqualError(err, "400 Wrong data")
+	s.assert.EqualError(err, "405 Method not allowed")
 }
 
 func (s *KongoTestSuite) TestCallApiWhenReturnsHttpErrorWithEmptyBody() {
-	s.mux.HandleFunc("/status", func(w http.ResponseWriter, r *http.Request) {
-		s.assert.Equal(http.MethodGet, r.Method)
+	s.mux.HandleFunc("/s", func(w http.ResponseWriter, r *http.Request) {
+		s.assert.Equal(http.MethodHead, r.Method)
 
-		w.WriteHeader(http.StatusBadRequest)
+		w.WriteHeader(http.StatusNotFound)
 
 		fmt.Fprint(w, ``)
 	})
 
-	req, _ := s.client.NewRequest(context.TODO(), http.MethodGet, "/status")
+	req, _ := s.client.NewRequest(context.TODO(), http.MethodHead, "/s")
 	res, err := s.client.Do(req, nil)
 
 	s.assert.NotNil(res)
-	s.assert.EqualError(err, "400 Request error")
+	s.assert.EqualError(err, "404 Request error")
 }
 
 func (s *KongoTestSuite) TestCallApiWhenReturnsHttpErrorWithNonJsonBody() {
@@ -168,8 +194,9 @@ func (s *KongoTestSuite) TestCallApiWhenReturnsHttpErrorWithNonJsonBody() {
 		fmt.Fprint(w, `Something wrong`)
 	})
 
-	req, _ := s.client.NewRequest(context.TODO(), http.MethodGet, "/status")
-	res, err := s.client.Do(req, nil)
+	client, _ := New(nil, s.server.URL)
+	req, _ := client.NewRequest(context.TODO(), http.MethodGet, "/status")
+	res, err := client.Do(req, nil)
 
 	s.assert.NotNil(res)
 	s.assert.EqualError(err, "400 Something wrong")
@@ -179,11 +206,13 @@ func (s *KongoTestSuite) TestCallApiResource() {
 	s.mux.HandleFunc("/status", func(w http.ResponseWriter, r *http.Request) {
 		s.assert.Equal(http.MethodGet, r.Method)
 
-		fmt.Fprint(w, `{"status": true}`)
+		fmt.Fprint(w, `{"database": {"reachable": true}}`)
 	})
 
 	v := struct {
-		Status bool `json:"status"`
+		Database struct {
+			Reachable bool `json:"reachable"`
+		} `json:"database"`
 	}{}
 
 	req, _ := s.client.NewRequest(context.TODO(), http.MethodGet, "/status")
@@ -191,7 +220,7 @@ func (s *KongoTestSuite) TestCallApiResource() {
 
 	s.assert.NotNil(res)
 	s.assert.Nil(err)
-	s.assert.True(v.Status)
+	s.assert.True(v.Database.Reachable)
 }
 
 func TestKongoTestSuite(t *testing.T) {
