@@ -8,6 +8,9 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"strconv"
+	"strings"
+	"time"
 )
 
 const (
@@ -40,6 +43,11 @@ type (
 
 		// Error message based on http status code
 		Message string `json:"message, omitempty"`
+	}
+
+	// Custom time struct for json parsing
+	Time struct {
+		time.Time
 	}
 )
 
@@ -74,14 +82,8 @@ func New(client *http.Client, baseURL string) (*Kongo, error) {
 	return NewClient(client, parsedURL)
 }
 
-// NewRequest creates an API requrest. A relative URL can be provided in resource string.
-func (k *Kongo) NewRequest(ctx context.Context, method string, resource string) (*http.Request, error) {
-	res, err := url.Parse(resource)
-
-	if err != nil {
-		return nil, err
-	}
-
+// NewRequest creates an API requrest. A relative URL can be provided in res URL instance.
+func (k *Kongo) NewRequest(ctx context.Context, method string, res *url.URL) (*http.Request, error) {
 	url := k.BaseURL.ResolveReference(res)
 
 	req, err := http.NewRequest(method, url.String(), nil)
@@ -166,4 +168,24 @@ func (e *ErrorResponse) Error() string {
 		e.Response.StatusCode,
 		e.Message,
 	)
+}
+
+func (t *Time) UnmarshalJSON(value []byte) (err error) {
+	v := strings.Trim(string(value), "\"")
+
+	if v == "" {
+		t.Time = time.Time{}
+
+		return
+	}
+
+	timestamp, err := strconv.ParseInt(v, 10, 64)
+
+	if err != nil {
+		return
+	}
+
+	t.Time = time.Unix(timestamp, 0)
+
+	return
 }

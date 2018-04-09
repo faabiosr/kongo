@@ -3,6 +3,7 @@ package kongo
 import (
 	"context"
 	"net/http"
+	"net/url"
 )
 
 type (
@@ -195,7 +196,9 @@ type (
 
 // InfoWithContext retrieves the server node information
 func (n *NodeService) InfoWithContext(ctx context.Context) (*NodeInfo, *http.Response, error) {
-	req, err := n.client.NewRequest(ctx, http.MethodGet, "/")
+	resource, _ := url.Parse("/status")
+
+	req, err := n.client.NewRequest(ctx, http.MethodGet, resource)
 
 	if err != nil {
 		return nil, nil, err
@@ -219,7 +222,9 @@ func (n *NodeService) Info() (*NodeInfo, *http.Response, error) {
 
 // StatusWithContext retrieves the server node status.
 func (n *NodeService) StatusWithContext(ctx context.Context) (*NodeStatus, *http.Response, error) {
-	req, err := n.client.NewRequest(ctx, http.MethodGet, "/status")
+	resource, _ := url.Parse("/status")
+
+	req, err := n.client.NewRequest(ctx, http.MethodGet, resource)
 
 	if err != nil {
 		return nil, nil, err

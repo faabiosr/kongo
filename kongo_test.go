@@ -2,6 +2,7 @@ package kongo
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
@@ -28,6 +29,10 @@ type (
 
 	KongoTestSuite struct {
 		BaseTestSuite
+	}
+
+	MockData struct {
+		Created Time `json:"created"`
 	}
 )
 
@@ -85,26 +90,21 @@ func (s *KongoTestSuite) TestInstance() {
 	s.assert.Implements(new(Node), s.client.Node)
 }
 
-func (s *KongoTestSuite) TestCreateRequestWithInvalidResourcePath() {
-	_, err := s.client.NewRequest(context.TODO(), http.MethodGet, "/%1status")
-
-	s.assert.Error(err)
-}
-
 func (s *KongoTestSuite) TestCreateRequestWithInvalidMethod() {
-	_, err := s.client.NewRequest(context.TODO(), "bad method", "/status")
+	resource, _ := url.Parse("/status")
+	_, err := s.client.NewRequest(context.TODO(), "bad method", resource)
 
 	s.assert.Error(err)
 }
 
 func (s *KongoTestSuite) TestCreateRequest() {
 	ctx := context.TODO()
-	req, _ := s.client.NewRequest(ctx, http.MethodGet, "/status")
-	url, _ := url.Parse("/status")
+	resource, _ := url.Parse("/status")
+	req, _ := s.client.NewRequest(ctx, http.MethodGet, resource)
 
 	s.assert.NotNil(req)
 	s.assert.Equal(http.MethodGet, req.Method)
-	s.assert.Equal(url.Path, req.URL.Path)
+	s.assert.Equal(resource.Path, req.URL.Path)
 	s.assert.Equal(ctx, req.Context())
 	s.assert.Equal(mediaType, req.Header.Get("Accept"))
 	s.assert.Equal(mediaType, req.Header.Get("Content-Type"))
@@ -126,7 +126,8 @@ func (s *KongoTestSuite) TestCallApiResourceWithoutValueReturns() {
 		fmt.Fprint(w, `{"status": true}`)
 	})
 
-	req, _ := s.client.NewRequest(context.TODO(), http.MethodGet, "/status")
+	resource, _ := url.Parse("/status")
+	req, _ := s.client.NewRequest(context.TODO(), http.MethodGet, resource)
 	res, err := s.client.Do(req, nil)
 
 	s.assert.NotNil(res)
@@ -146,7 +147,8 @@ func (s *KongoTestSuite) TestCallApiResourceWithWrongValueJsonStruct() {
 		} `json:"database"`
 	}{}
 
-	req, _ := s.client.NewRequest(context.TODO(), http.MethodGet, "/status")
+	resource, _ := url.Parse("/status")
+	req, _ := s.client.NewRequest(context.TODO(), http.MethodGet, resource)
 	res, err := s.client.Do(req, &v)
 
 	s.assert.Nil(res)
@@ -162,7 +164,8 @@ func (s *KongoTestSuite) TestCallApiWhenReturnsHttpErrors() {
 		fmt.Fprint(w, `{"message": "Method not allowed"}`)
 	})
 
-	req, _ := s.client.NewRequest(context.TODO(), http.MethodPost, "/status")
+	resource, _ := url.Parse("/status")
+	req, _ := s.client.NewRequest(context.TODO(), http.MethodPost, resource)
 	res, err := s.client.Do(req, nil)
 
 	s.assert.NotNil(res)
@@ -178,7 +181,8 @@ func (s *KongoTestSuite) TestCallApiWhenReturnsHttpErrorWithEmptyBody() {
 		fmt.Fprint(w, ``)
 	})
 
-	req, _ := s.client.NewRequest(context.TODO(), http.MethodHead, "/s")
+	resource, _ := url.Parse("/s")
+	req, _ := s.client.NewRequest(context.TODO(), http.MethodHead, resource)
 	res, err := s.client.Do(req, nil)
 
 	s.assert.NotNil(res)
@@ -195,7 +199,8 @@ func (s *KongoTestSuite) TestCallApiWhenReturnsHttpErrorWithNonJsonBody() {
 	})
 
 	client, _ := New(nil, s.server.URL)
-	req, _ := client.NewRequest(context.TODO(), http.MethodGet, "/status")
+	resource, _ := url.Parse("/status")
+	req, _ := s.client.NewRequest(context.TODO(), http.MethodGet, resource)
 	res, err := client.Do(req, nil)
 
 	s.assert.NotNil(res)
@@ -215,12 +220,47 @@ func (s *KongoTestSuite) TestCallApiResource() {
 		} `json:"database"`
 	}{}
 
-	req, _ := s.client.NewRequest(context.TODO(), http.MethodGet, "/status")
+	resource, _ := url.Parse("/status")
+	req, _ := s.client.NewRequest(context.TODO(), http.MethodGet, resource)
 	res, err := s.client.Do(req, &v)
 
 	s.assert.NotNil(res)
 	s.assert.Nil(err)
 	s.assert.True(v.Database.Reachable)
+}
+
+func (s *KongoTestSuite) TestJSONTimeParsingWithEmptyValue() {
+	var data MockData
+
+	json.Unmarshal(
+		[]byte(`{"created": ""}`),
+		&data,
+	)
+
+	s.assert.Equal("0001-01-01", data.Created.Format("2006-01-02"))
+}
+
+func (s *KongoTestSuite) TestJSONTimeParsingWithWrongData() {
+	var data MockData
+
+	err := json.Unmarshal(
+		[]byte(`{"created": {}}`),
+		&data,
+	)
+
+	s.assert.Error(err)
+}
+
+func (s *KongoTestSuite) TestJSONTimeParsing() {
+	var data MockData
+
+	json.Unmarshal(
+		[]byte(`{"created": "1522832400"}`),
+		&data,
+	)
+
+	s.assert.Equal("2018-04-04", data.Created.Format("2006-01-02"))
+
 }
 
 func TestKongoTestSuite(t *testing.T) {
