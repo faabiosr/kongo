@@ -1,6 +1,7 @@
 package kongo
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
@@ -45,7 +46,7 @@ type (
 		Message string `json:"message, omitempty"`
 	}
 
-	// Custom time struct for json parsing
+	// Time it is a custom time struct for json parsing
 	Time struct {
 		time.Time
 	}
@@ -82,11 +83,22 @@ func New(client *http.Client, baseURL string) (*Kongo, error) {
 	return NewClient(client, parsedURL)
 }
 
-// NewRequest creates an API requrest. A relative URL can be provided in res URL instance.
-func (k *Kongo) NewRequest(ctx context.Context, method string, res *url.URL) (*http.Request, error) {
+// NewRequest creates an API requrest. A relative URL can be provided in res URL instance. If specified, the
+// value pointed to by body JSON encoded and included in as the request body.
+func (k *Kongo) NewRequest(ctx context.Context, method string, res *url.URL, body interface{}) (*http.Request, error) {
 	url := k.BaseURL.ResolveReference(res)
 
-	req, err := http.NewRequest(method, url.String(), nil)
+	buf := new(bytes.Buffer)
+
+	if body != nil {
+		err := json.NewEncoder(buf).Encode(body)
+
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	req, err := http.NewRequest(method, url.String(), buf)
 
 	if err != nil {
 		return nil, err
@@ -170,6 +182,7 @@ func (e *ErrorResponse) Error() string {
 	)
 }
 
+// UnmarshalJSON unmarshals string time into Time instance
 func (t *Time) UnmarshalJSON(value []byte) (err error) {
 	v := strings.Trim(string(value), "\"")
 

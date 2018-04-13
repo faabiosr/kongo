@@ -1,0 +1,14 @@
+{
+    "database": {
+        "reachable": true
+    },
+    "server": {
+        "connections_accepted": 532,
+        "connections_active": 1,
+        "connections_handled": 532,
+        "connections_reading": 0,
+        "connections_waiting": 0,
+        "connections_writing": 1,
+        "total_requests": 532
+    }
+}

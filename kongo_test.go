@@ -92,7 +92,7 @@ func (s *KongoTestSuite) TestInstance() {
 
 func (s *KongoTestSuite) TestCreateRequestWithInvalidMethod() {
 	resource, _ := url.Parse("/status")
-	_, err := s.client.NewRequest(context.TODO(), "bad method", resource)
+	_, err := s.client.NewRequest(context.TODO(), "bad method", resource, nil)
 
 	s.assert.Error(err)
 }
@@ -100,7 +100,7 @@ func (s *KongoTestSuite) TestCreateRequestWithInvalidMethod() {
 func (s *KongoTestSuite) TestCreateRequest() {
 	ctx := context.TODO()
 	resource, _ := url.Parse("/status")
-	req, _ := s.client.NewRequest(ctx, http.MethodGet, resource)
+	req, _ := s.client.NewRequest(ctx, http.MethodGet, resource, nil)
 
 	s.assert.NotNil(req)
 	s.assert.Equal(http.MethodGet, req.Method)
@@ -127,7 +127,7 @@ func (s *KongoTestSuite) TestCallApiResourceWithoutValueReturns() {
 	})
 
 	resource, _ := url.Parse("/status")
-	req, _ := s.client.NewRequest(context.TODO(), http.MethodGet, resource)
+	req, _ := s.client.NewRequest(context.TODO(), http.MethodGet, resource, nil)
 	res, err := s.client.Do(req, nil)
 
 	s.assert.NotNil(res)
@@ -148,7 +148,7 @@ func (s *KongoTestSuite) TestCallApiResourceWithWrongValueJsonStruct() {
 	}{}
 
 	resource, _ := url.Parse("/status")
-	req, _ := s.client.NewRequest(context.TODO(), http.MethodGet, resource)
+	req, _ := s.client.NewRequest(context.TODO(), http.MethodGet, resource, nil)
 	res, err := s.client.Do(req, &v)
 
 	s.assert.Nil(res)
@@ -165,7 +165,7 @@ func (s *KongoTestSuite) TestCallApiWhenReturnsHttpErrors() {
 	})
 
 	resource, _ := url.Parse("/status")
-	req, _ := s.client.NewRequest(context.TODO(), http.MethodPost, resource)
+	req, _ := s.client.NewRequest(context.TODO(), http.MethodPost, resource, nil)
 	res, err := s.client.Do(req, nil)
 
 	s.assert.NotNil(res)
@@ -182,7 +182,7 @@ func (s *KongoTestSuite) TestCallApiWhenReturnsHttpErrorWithEmptyBody() {
 	})
 
 	resource, _ := url.Parse("/s")
-	req, _ := s.client.NewRequest(context.TODO(), http.MethodHead, resource)
+	req, _ := s.client.NewRequest(context.TODO(), http.MethodHead, resource, nil)
 	res, err := s.client.Do(req, nil)
 
 	s.assert.NotNil(res)
@@ -200,7 +200,7 @@ func (s *KongoTestSuite) TestCallApiWhenReturnsHttpErrorWithNonJsonBody() {
 
 	client, _ := New(nil, s.server.URL)
 	resource, _ := url.Parse("/status")
-	req, _ := s.client.NewRequest(context.TODO(), http.MethodGet, resource)
+	req, _ := client.NewRequest(context.TODO(), http.MethodGet, resource, nil)
 	res, err := client.Do(req, nil)
 
 	s.assert.NotNil(res)
@@ -221,12 +221,41 @@ func (s *KongoTestSuite) TestCallApiResource() {
 	}{}
 
 	resource, _ := url.Parse("/status")
-	req, _ := s.client.NewRequest(context.TODO(), http.MethodGet, resource)
+	req, _ := s.client.NewRequest(context.TODO(), http.MethodGet, resource, nil)
 	res, err := s.client.Do(req, &v)
 
 	s.assert.NotNil(res)
 	s.assert.Nil(err)
 	s.assert.True(v.Database.Reachable)
+}
+
+func (s *KongoTestSuite) TestCallApiResourceWithBody() {
+	s.mux.HandleFunc("/status", func(w http.ResponseWriter, r *http.Request) {
+		s.assert.Equal(http.MethodGet, r.Method)
+
+		var body map[string]string
+
+		json.NewDecoder(r.Body).Decode(&body)
+
+		s.assert.Equal("test", body["name"])
+
+		fmt.Fprint(w, `{"status": true}`)
+	})
+
+	v := struct {
+		Status bool `json:"status"`
+	}{}
+
+	resource, _ := url.Parse("/status")
+	body := map[string]string{"name": "test"}
+
+	client, _ := New(nil, s.server.URL)
+	req, _ := client.NewRequest(context.TODO(), http.MethodGet, resource, body)
+	res, err := s.client.Do(req, &v)
+
+	s.assert.NotNil(res)
+	s.assert.Nil(err)
+	s.assert.True(v.Status)
 }
 
 func (s *KongoTestSuite) TestJSONTimeParsingWithEmptyValue() {
@@ -260,7 +289,6 @@ func (s *KongoTestSuite) TestJSONTimeParsing() {
 	)
 
 	s.assert.Equal("2018-04-04", data.Created.Format("2006-01-02"))
-
 }
 
 func TestKongoTestSuite(t *testing.T) {

@@ -6,6 +6,11 @@ import (
 	"net/url"
 )
 
+const (
+	nodeInfoResourcePath   = "/"
+	nodeStatusResourcePath = "/status"
+)
+
 type (
 	// Node retrieves the info about the server nodes.
 	Node interface {
@@ -196,9 +201,9 @@ type (
 
 // InfoWithContext retrieves the server node information
 func (n *NodeService) InfoWithContext(ctx context.Context) (*NodeInfo, *http.Response, error) {
-	resource, _ := url.Parse("/status")
+	resource, _ := url.Parse(nodeInfoResourcePath)
 
-	req, err := n.client.NewRequest(ctx, http.MethodGet, resource)
+	req, err := n.client.NewRequest(ctx, http.MethodGet, resource, nil)
 
 	if err != nil {
 		return nil, nil, err
@@ -222,9 +227,9 @@ func (n *NodeService) Info() (*NodeInfo, *http.Response, error) {
 
 // StatusWithContext retrieves the server node status.
 func (n *NodeService) StatusWithContext(ctx context.Context) (*NodeStatus, *http.Response, error) {
-	resource, _ := url.Parse("/status")
+	resource, _ := url.Parse(nodeStatusResourcePath)
 
-	req, err := n.client.NewRequest(ctx, http.MethodGet, resource)
+	req, err := n.client.NewRequest(ctx, http.MethodGet, resource, nil)
 
 	if err != nil {
 		return nil, nil, err

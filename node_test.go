@@ -1,7 +1,6 @@
 package kongo
 
 import (
-	"context"
 	"fmt"
 	"github.com/stretchr/testify/suite"
 	"io"
@@ -13,8 +12,8 @@ type NodeTestSuite struct {
 	BaseTestSuite
 }
 
-func (s *NodeTestSuite) TestInfoWithContextReturnsHttpError() {
-	s.mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+func (s *NodeTestSuite) TestInfoReturnsHttpError() {
+	s.mux.HandleFunc(nodeInfoResourcePath, func(w http.ResponseWriter, r *http.Request) {
 		s.assert.Equal(http.MethodGet, r.Method)
 
 		w.WriteHeader(http.StatusBadRequest)
@@ -23,24 +22,24 @@ func (s *NodeTestSuite) TestInfoWithContextReturnsHttpError() {
 	})
 
 	client, _ := New(nil, s.server.URL)
-	_, res, err := client.Node.InfoWithContext(context.TODO())
+	_, res, err := client.Node.Info()
 
 	s.assert.IsType(&http.Response{}, res)
 	s.assert.Error(err)
 }
 
-func (s *NodeTestSuite) TestInfoWithContext() {
-	s.mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+func (s *NodeTestSuite) TestInfo() {
+	s.mux.HandleFunc(nodeInfoResourcePath, func(w http.ResponseWriter, r *http.Request) {
 		s.assert.Equal(http.MethodGet, r.Method)
 
-		file, _ := s.LoadFixture("fixtures/info_payload.json")
+		file, _ := s.LoadFixture("fixtures/node_info_payload.json")
 
 		io.Copy(w, file)
 
 		defer file.Close()
 	})
 
-	info, res, err := s.client.Node.InfoWithContext(context.TODO())
+	info, res, err := s.client.Node.Info()
 
 	s.assert.IsType(&NodeInfo{}, info)
 	s.assert.IsType(&http.Response{}, res)
@@ -153,28 +152,8 @@ func (s *NodeTestSuite) TestInfoWithContext() {
 	s.assert.NotEmpty(info.Hostname)
 }
 
-func (s *NodeTestSuite) TestInfo() {
-	s.mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		s.assert.Equal(http.MethodGet, r.Method)
-
-		file, _ := s.LoadFixture("fixtures/info_payload.json")
-
-		io.Copy(w, file)
-
-		defer file.Close()
-	})
-
-	info, res, err := s.client.Node.Info()
-
-	s.assert.IsType(&NodeInfo{}, info)
-	s.assert.IsType(&http.Response{}, res)
-	s.assert.Nil(err)
-
-	s.assert.NotEmpty(info.Version)
-}
-
-func (s *NodeTestSuite) TestStatusWithContextReturnsHttpError() {
-	s.mux.HandleFunc("/status", func(w http.ResponseWriter, r *http.Request) {
+func (s *NodeTestSuite) TestStatusReturnsHttpError() {
+	s.mux.HandleFunc(nodeStatusResourcePath, func(w http.ResponseWriter, r *http.Request) {
 		s.assert.Equal(http.MethodGet, r.Method)
 
 		w.WriteHeader(http.StatusBadRequest)
@@ -183,73 +162,21 @@ func (s *NodeTestSuite) TestStatusWithContextReturnsHttpError() {
 	})
 
 	client, _ := New(nil, s.server.URL)
-	_, res, err := client.Node.StatusWithContext(context.TODO())
+	_, res, err := client.Node.Status()
 
 	s.assert.IsType(&http.Response{}, res)
 	s.assert.Error(err)
 }
 
-func (s *NodeTestSuite) TestStatusWithContext() {
-	s.mux.HandleFunc("/status", func(w http.ResponseWriter, r *http.Request) {
-		s.assert.Equal(http.MethodGet, r.Method)
-
-		response := `
-		{
-            "database": {
-                "reachable": true
-            },
-            "server": {
-                "connections_accepted": 532,
-                "connections_active": 1,
-                "connections_handled": 532,
-                "connections_reading": 0,
-                "connections_waiting": 0,
-                "connections_writing": 1,
-                "total_requests": 532
-            }
-		}`
-
-		fmt.Fprint(w, response)
-	})
-
-	status, res, err := s.client.Node.StatusWithContext(context.TODO())
-
-	s.assert.IsType(&NodeStatus{}, status)
-	s.assert.IsType(&http.Response{}, res)
-	s.assert.Nil(err)
-
-	s.assert.NotZero(status.Server.ConnectionsAccepted)
-	s.assert.NotZero(status.Server.ConnectionsActive)
-	s.assert.NotZero(status.Server.ConnectionsHandled)
-	s.assert.Zero(status.Server.ConnectionsReading)
-	s.assert.Zero(status.Server.ConnectionsWaiting)
-	s.assert.NotZero(status.Server.ConnectionsWriting)
-	s.assert.NotZero(status.Server.TotalRequests)
-
-	s.assert.True(status.Database.Reachable)
-}
-
 func (s *NodeTestSuite) TestStatus() {
-	s.mux.HandleFunc("/status", func(w http.ResponseWriter, r *http.Request) {
+	s.mux.HandleFunc(nodeStatusResourcePath, func(w http.ResponseWriter, r *http.Request) {
 		s.assert.Equal(http.MethodGet, r.Method)
 
-		response := `
-		{
-            "database": {
-                "reachable": true
-            },
-            "server": {
-                "connections_accepted": 532,
-                "connections_active": 1,
-                "connections_handled": 532,
-                "connections_reading": 0,
-                "connections_waiting": 0,
-                "connections_writing": 1,
-                "total_requests": 532
-            }
-		}`
+		file, _ := s.LoadFixture("fixtures/node_status_payload.json")
 
-		fmt.Fprint(w, response)
+		io.Copy(w, file)
+
+		defer file.Close()
 	})
 
 	status, res, err := s.client.Node.Status()
