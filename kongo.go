@@ -35,6 +35,9 @@ type (
 
 		// Node api service
 		Node Node
+
+		// Services api service
+		Services Services
 	}
 
 	// An ErrorResponse report the error caused by and API request
@@ -64,6 +67,7 @@ func NewClient(client *http.Client, baseURL *url.URL) (*Kongo, error) {
 
 	k := &Kongo{client: client, BaseURL: baseURL, UserAgent: userAgent}
 	k.Node = &NodeService{k}
+	k.Services = &ServicesService{k}
 
 	return k, nil
 }

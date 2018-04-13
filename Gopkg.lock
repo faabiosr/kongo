@@ -8,6 +8,24 @@
   version = "v1.1.0"
 
 [[projects]]
+  branch = "master"
+  name = "github.com/google/go-querystring"
+  packages = ["query"]
+  revision = "53e6ce116135b80d037921a7fdd5138cf32d7a8a"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/hashicorp/go-version"
+  packages = ["."]
+  revision = "23480c0665776210b5fbbac6eaaee40e3e6a96b7"
+
+[[projects]]
+  name = "github.com/liip/sheriff"
+  packages = ["."]
+  revision = "0ae0e1f38ffdeff014c9c7af0a1d3cc04f639b5e"
+  version = "0.3.0"
+
+[[projects]]
   name = "github.com/pmezard/go-difflib"
   packages = ["difflib"]
   revision = "792786c7400a136282c1664665ae0a8db921c6c2"
@@ -26,6 +44,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "1b10b1e002262a75c43af1c7f27d9a5df6b0662f1d76892ca432e3835a3cc704"
+  inputs-digest = "71341158db5c1058861d3f43ecd97d55993097e28f14681a27189c8c3be9e6e5"
   solver-name = "gps-cdcl"
   solver-version = 1

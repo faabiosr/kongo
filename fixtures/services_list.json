@@ -1,0 +1,20 @@
+{
+    "data": [
+        {
+            "connect_timeout": 60000,
+            "created_at": 1523289670,
+            "host": "fn-user.com",
+            "id": "0daad537-6699-4765-baa1-dbe74a95d541",
+            "name": "fn",
+            "path": "/api",
+            "port": 80,
+            "protocol": "http",
+            "read_timeout": 60000,
+            "retries": 5,
+            "updated_at": 1523289670,
+            "write_timeout": 60000
+        }
+    ],
+    "next": "/services?offset=WyIwZGFhZDUzNy02Njk5LTQ3NjUtYmFhMS1kYmU3NGE5NWQ1NDEiXQ",
+    "offset": "WyIwZGFhZDUzNy02Njk5LTQ3NjUtYmFhMS1kYmU3NGE5NWQ1NDEiXQ"
+}
