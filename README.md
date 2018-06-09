@@ -45,21 +45,31 @@ Read the full documentation at [https://godoc.org/github.com/fabiorphp/kongo](ht
 
 ### Requirements
 
+- Install [Go](https://golang.org)
 - Install [go dep](https://github.com/golang/dep)
 
-### Run tests
+### Makefile
 ```sh
-// tests
-$ make test
-
-// test with coverage
-$ make test-coverage
-
-// clean-up
+// Clean up
 $ make clean
 
-// configure (download dependencies)
+// Creates folders and download dependencies
 $ make configure
+
+//Run tests and generates html coverage file
+make cover
+
+// Download project dependencies
+make depend
+
+// Format all go files
+make fmt
+
+//Run linters
+make lint
+
+// Run tests
+make test
 ```
 
 ## License
