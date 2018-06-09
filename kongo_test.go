@@ -88,6 +88,8 @@ func (s *KongoTestSuite) TestInstance() {
 	s.assert.IsType(new(Kongo), s.client)
 	s.assert.Equal(userAgent, s.client.UserAgent)
 	s.assert.Implements(new(Node), s.client.Node)
+	s.assert.Implements(new(Services), s.client.Services)
+	s.assert.Implements(new(Routes), s.client.Routes)
 }
 
 func (s *KongoTestSuite) TestCreateRequestWithInvalidMethod() {

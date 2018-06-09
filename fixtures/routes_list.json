@@ -1,0 +1,21 @@
+{
+    "data": [
+        {
+    		"id": "22108377-8f26-4c0e-bd9e-2962c1d6b0e6",
+    		"created_at": 14888869056483,
+    		"updated_at": 14888869056483,
+    		"protocols": ["http", "https"],
+    		"methods": ["GET"],
+    		"hosts": ["example.com"],
+    		"paths": ["/api"],
+    		"regex_priority": 0,
+    		"strip_path": true,
+    		"preserve_host": false,
+    		"service": {
+    		    "id": "0daad537-6699-4765-baa1-dbe74a95d541"
+    		}
+        }
+    ],
+    "next": "/routes?offset=WyIwZGFhZDUzNy02Njk5LTQ3NjUtYmFhMS1kYmU3NGE5NWQ1NDEiXQ",
+    "offset": "WyIwZGFhZDUzNy02Njk5LTQ3NjUtYmFhMS1kYmU3NGE5NWQ1NDEiXQ"
+}
