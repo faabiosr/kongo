@@ -92,6 +92,7 @@ func (s *KongoTestSuite) TestInstance() {
 	s.assert.Implements(new(Routes), s.client.Routes)
 	s.assert.Implements(new(Customers), s.client.Customers)
 	s.assert.Implements(new(Certificates), s.client.Certificates)
+	s.assert.Implements(new(SNIs), s.client.SNIs)
 }
 
 func (s *KongoTestSuite) TestCreateRequestWithInvalidMethod() {

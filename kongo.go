@@ -47,6 +47,9 @@ type (
 
 		//Certificates api service
 		Certificates Certificates
+
+		//SNIs api service
+		SNIs SNIs
 	}
 
 	// An ErrorResponse report the error caused by and API request
@@ -80,6 +83,7 @@ func NewClient(client *http.Client, baseURL *url.URL) (*Kongo, error) {
 	k.Routes = &RoutesService{k}
 	k.Customers = &CustomersService{k}
 	k.Certificates = &CertificatesService{k}
+	k.SNIs = &SNIsService{k}
 
 	return k, nil
 }
