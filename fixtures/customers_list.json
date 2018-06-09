@@ -1,0 +1,12 @@
+{
+    "data": [
+        {
+			"created_at": 1528557815000,
+			"custom_id": "1",
+			"id": "ec2778a3-fdf5-4901-9f76-f93a1ac1828a",
+			"username": "admin"
+        }
+    ],
+    "next": "/customers?offset=WyIwZGFhZDUzNy02Njk5LTQ3NjUtYmFhMS1kYmU3NGE5NWQ1NDEiXQ",
+    "offset": "WyIwZGFhZDUzNy02Njk5LTQ3NjUtYmFhMS1kYmU3NGE5NWQ1NDEiXQ"
+}
