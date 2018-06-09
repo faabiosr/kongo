@@ -1,0 +1,9 @@
+{
+    "cert": "-----BEGIN CERTIFICATE-----...",
+    "created_at": 1528571790000,
+    "id": "ce9832aa-5d26-41c4-af86-197c7732df1c",
+    "key": "-----BEGIN RSA PRIVATE KEY-----...",
+	"snis": [
+		"example.com"
+	]
+}
