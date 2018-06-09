@@ -38,12 +38,12 @@
     "require",
     "suite"
   ]
-  revision = "12b6f73e6084dad08a7c6e575284b177ecafbc71"
-  version = "v1.2.1"
+  revision = "f35b8ab0b5a2cef36673838d662e249dd9c94686"
+  version = "v1.2.2"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "71341158db5c1058861d3f43ecd97d55993097e28f14681a27189c8c3be9e6e5"
+  inputs-digest = "cb157f62b90ef09d872cdaa380e1bd0a55788f5a7c6433a37f5f7d23ce53f838"
   solver-name = "gps-cdcl"
   solver-version = 1
