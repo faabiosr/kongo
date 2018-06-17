@@ -55,7 +55,7 @@ func (s *ServicesTestSuite) TestCreate() {
 	s.assert.IsType(&http.Response{}, res)
 	s.assert.Nil(err)
 
-	s.assert.NotEmpty(svc.Id)
+	s.assert.NotEmpty(svc.ID)
 	s.assert.NotEmpty(svc.CreatedAt)
 	s.assert.NotEmpty(svc.UpdatedAt)
 }
@@ -84,7 +84,7 @@ func (s *ServicesTestSuite) TestCreateByURL() {
 	s.assert.IsType(&http.Response{}, res)
 	s.assert.Nil(err)
 
-	s.assert.NotEmpty(svc.Id)
+	s.assert.NotEmpty(svc.ID)
 	s.assert.NotEmpty(svc.CreatedAt)
 	s.assert.NotEmpty(svc.UpdatedAt)
 	s.assert.Equal("https", svc.Protocol)
@@ -130,7 +130,7 @@ func (s *ServicesTestSuite) TestList() {
 	s.assert.NotZero(services[0].ConnectTimeout)
 	s.assert.NotZero(services[0].CreatedAt.Unix())
 	s.assert.NotEmpty(services[0].Host)
-	s.assert.NotEmpty(services[0].Id)
+	s.assert.NotEmpty(services[0].ID)
 	s.assert.NotEmpty(services[0].Name)
 	s.assert.NotEmpty(services[0].Path)
 	s.assert.NotZero(services[0].Port)
@@ -198,7 +198,7 @@ func (s *ServicesTestSuite) TestGet() {
 	s.assert.IsType(&http.Response{}, res)
 	s.assert.Nil(err)
 
-	s.assert.NotEmpty(svc.Id)
+	s.assert.NotEmpty(svc.ID)
 	s.assert.NotEmpty(svc.CreatedAt)
 	s.assert.NotEmpty(svc.UpdatedAt)
 	s.assert.Equal("https", svc.Protocol)
@@ -249,7 +249,7 @@ func (s *ServicesTestSuite) TestUpdate() {
 	s.assert.IsType(&http.Response{}, res)
 	s.assert.Nil(err)
 
-	s.assert.NotEmpty(svc.Id)
+	s.assert.NotEmpty(svc.ID)
 	s.assert.NotEmpty(svc.CreatedAt)
 	s.assert.NotEmpty(svc.UpdatedAt)
 }
@@ -278,7 +278,7 @@ func (s *ServicesTestSuite) TestUpdateByURL() {
 	s.assert.IsType(&http.Response{}, res)
 	s.assert.Nil(err)
 
-	s.assert.NotEmpty(svc.Id)
+	s.assert.NotEmpty(svc.ID)
 	s.assert.NotEmpty(svc.CreatedAt)
 	s.assert.NotEmpty(svc.UpdatedAt)
 	s.assert.Equal("https", svc.Protocol)

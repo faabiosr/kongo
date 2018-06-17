@@ -16,69 +16,68 @@ const (
 type (
 	// Services manages the Kong upstream services.
 	Services interface {
-		// Create creates a new service
+		// Create creates a new service.
 		Create(svc *Service) (*Service, *http.Response, error)
 
-		// CreateWithContext creates a new service
+		// CreateWithContext creates a new service.
 		CreateWithContext(ctx context.Context, svc *Service) (*Service, *http.Response, error)
 
-		// CreateByURLWithContext creates a new service by URL
+		// CreateByURL creates a new service by URL.
 		CreateByURL(svc *Service) (*Service, *http.Response, error)
 
-		// CreateByURLWithContext creates a new service by URL
+		// CreateByURLWithContext creates a new service by URL.
 		CreateByURLWithContext(ctx context.Context, svc *Service) (*Service, *http.Response, error)
 
-		// Delete deletes registred service by ID or Name
+		// Delete deletes registered service by ID or Name.
 		Delete(idOrName string) (*http.Response, error)
 
-		// DeleteWithContext deletes registred service by ID or Name
+		// DeleteWithContext deletes registered service by ID or Name.
 		DeleteWithContext(ctx context.Context, idOrName string) (*http.Response, error)
 
-		// Get retrieves registred service by ID or Name
+		// Get retrieves registered service by ID or Name.
 		Get(idOrName string) (*Service, *http.Response, error)
 
-		// GetWithContext retrieves registred service by ID or Name
+		// GetWithContext retrieves registered service by ID or Name.
 		GetWithContext(ctx context.Context, idOrName string) (*Service, *http.Response, error)
 
-		// List retrieves a list of registred services
+		// List retrieves the registered services.
 		List(options *ListServicesOptions) ([]*Service, *http.Response, error)
 
-		// ListWithContext retrieves a list of registred services
+		// ListWithContext retrieves the registered services.
 		ListWithContext(ctx context.Context, options *ListServicesOptions) ([]*Service, *http.Response, error)
 
-		// Update updates a service registred by ID or Name
+		// Update updates a service registered by ID or Name.
 		Update(idOrName string, svc *Service) (*Service, *http.Response, error)
 
-		// UpdateWithContext updates a service registred by ID or Name
+		// UpdateWithContext updates a service registered by ID or Name.
 		UpdateWithContext(ctx context.Context, idOrName string, svc *Service) (*Service, *http.Response, error)
 
-		// UpdateByURL updates a service registred by URL and pass the ID or Name
+		// UpdateByURL updates a service registered ID or Name passing the URL.
 		UpdateByURL(idOrName string, svc *Service) (*Service, *http.Response, error)
 
-		// UpdateByURLWithContext updates a service registred by URL and pass the ID or Name
+		// UpdateByURLWithContext updates a service registered by ID or Name passing the URL.
 		UpdateByURLWithContext(ctx context.Context, idOrName string, svc *Service) (*Service, *http.Response, error)
 	}
 
-	// ServicesService it's a concrete instance of service
+	// ServicesService it's a concrete instance of service.
 	ServicesService struct {
-
-		// Kongo client manages communication by API.
+		// Kongo client manages communication throught API.
 		client *Kongo
 	}
 
-	// Service it's a structure of API result
+	// Service it's a structure of API result.
 	Service struct {
 		// The timeout in milliseconds for establishing a connection to the upstream server. Defaults to 60000.
 		ConnectTimeout int64 `json:"connect_timeout,omitempty" groups:"create,update"`
 
-		// The date when the service was registred
+		// The date when the service was registered.
 		CreatedAt Time `json:"created_at"`
 
 		// The host of the upstream server.
 		Host string `json:"host" groups:"create,update"`
 
-		// The identification of service registred
-		Id string `json:"id"`
+		// The identification of service registered.
+		ID string `json:"id"`
 
 		// The service name.
 		Name string `json:"name" groups:"create,create_url,update,update_url"`
@@ -151,27 +150,27 @@ func (s *ServicesService) create(ctx context.Context, svc *Service, groupName st
 	return root, res, nil
 }
 
-// CreateWithContext creates a new service
+// CreateWithContext creates a new service.
 func (s *ServicesService) CreateWithContext(ctx context.Context, svc *Service) (*Service, *http.Response, error) {
 	return s.create(ctx, svc, "create")
 }
 
-// Create creates a new service
+// Create creates a new service.
 func (s *ServicesService) Create(svc *Service) (*Service, *http.Response, error) {
 	return s.CreateWithContext(context.TODO(), svc)
 }
 
-// CreateByURLWithContext creates a new service by URL
+// CreateByURLWithContext creates a new service by URL.
 func (s *ServicesService) CreateByURLWithContext(ctx context.Context, svc *Service) (*Service, *http.Response, error) {
 	return s.create(ctx, svc, "create_url")
 }
 
-// CreateByURL creates a new service by URL
+// CreateByURL creates a new service by URL.
 func (s *ServicesService) CreateByURL(svc *Service) (*Service, *http.Response, error) {
 	return s.CreateByURLWithContext(context.TODO(), svc)
 }
 
-// DeleteWithContext retrieves registred service by ID or Name
+// DeleteWithContext deletes registered service by ID or Name.
 func (s *ServicesService) DeleteWithContext(ctx context.Context, idOrName string) (*http.Response, error) {
 	resource, _ := url.Parse(servicesResourcePath)
 	resource.Path = path.Join(resource.Path, idOrName)
@@ -182,21 +181,15 @@ func (s *ServicesService) DeleteWithContext(ctx context.Context, idOrName string
 		return nil, err
 	}
 
-	res, err := s.client.Do(req, nil)
-
-	if err != nil {
-		return res, err
-	}
-
-	return res, nil
+	return s.client.Do(req, nil)
 }
 
-// Delete retrieves registred service by ID or Name
+// Delete deletes registered service by ID or Name.
 func (s *ServicesService) Delete(idOrName string) (*http.Response, error) {
 	return s.DeleteWithContext(context.TODO(), idOrName)
 }
 
-// GetWithContext retrieves registred service by ID or Name
+// GetWithContext retrieves registered service by ID or Name.
 func (s *ServicesService) GetWithContext(ctx context.Context, idOrName string) (*Service, *http.Response, error) {
 	resource, _ := url.Parse(servicesResourcePath)
 	resource.Path = path.Join(resource.Path, idOrName)
@@ -218,12 +211,12 @@ func (s *ServicesService) GetWithContext(ctx context.Context, idOrName string) (
 	return svc, res, nil
 }
 
-// Get retrieves registred service by ID or Name
+// Get retrieves registered service by ID or Name.
 func (s *ServicesService) Get(idOrName string) (*Service, *http.Response, error) {
 	return s.GetWithContext(context.TODO(), idOrName)
 }
 
-// ListWithContext retrieves a list of registred services
+// ListWithContext retrieves the registered services.
 func (s *ServicesService) ListWithContext(ctx context.Context, options *ListServicesOptions) ([]*Service, *http.Response, error) {
 	opts, _ := query.Values(options)
 	resource, _ := url.Parse(servicesResourcePath)
@@ -246,12 +239,11 @@ func (s *ServicesService) ListWithContext(ctx context.Context, options *ListServ
 	return root.Services, res, nil
 }
 
-// List retrieves a list of registred services
+// List retrieves the registered services.
 func (s *ServicesService) List(options *ListServicesOptions) ([]*Service, *http.Response, error) {
 	return s.ListWithContext(context.TODO(), options)
 }
 
-// update updates a service registred
 func (s *ServicesService) update(ctx context.Context, idOrName string, svc *Service, groupName string) (*Service, *http.Response, error) {
 	resource, _ := url.Parse(servicesResourcePath)
 	resource.Path = path.Join(resource.Path, idOrName)
@@ -280,22 +272,22 @@ func (s *ServicesService) update(ctx context.Context, idOrName string, svc *Serv
 	return root, res, nil
 }
 
-// UpdateWithContext updates a service
+// UpdateWithContext updates a service registered by ID or Name.
 func (s *ServicesService) UpdateWithContext(ctx context.Context, idOrName string, svc *Service) (*Service, *http.Response, error) {
 	return s.update(ctx, idOrName, svc, "update")
 }
 
-// Update updates a service
+// Update updates a service registered by ID or Name.
 func (s *ServicesService) Update(idOrName string, svc *Service) (*Service, *http.Response, error) {
 	return s.UpdateWithContext(context.TODO(), idOrName, svc)
 }
 
-// UpdateByURLWithContext updates a service registred by URL and pass the ID or Name
+// UpdateByURLWithContext updates a service registered by ID or Name passing the URL.
 func (s *ServicesService) UpdateByURLWithContext(ctx context.Context, idOrName string, svc *Service) (*Service, *http.Response, error) {
 	return s.update(ctx, idOrName, svc, "update_url")
 }
 
-// UpdateByURL updates a service registred by URL and pass the ID or Name
+// UpdateByURL updates a service registered ID or Name passing the URL.
 func (s *ServicesService) UpdateByURL(idOrName string, svc *Service) (*Service, *http.Response, error) {
 	return s.UpdateByURLWithContext(context.TODO(), idOrName, svc)
 }
