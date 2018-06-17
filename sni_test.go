@@ -23,7 +23,7 @@ func (s *SNIsTestSuite) TestCreateReturnsHttpError() {
 
 	sni := &SNI{
 		Name:             "example.com",
-		SSLCertificateId: "ce9832aa-5d26-41c4-af86-197c7732df1c",
+		SSLCertificateID: "ce9832aa-5d26-41c4-af86-197c7732df1c",
 	}
 
 	_, res, err := s.client.SNIs.Create(sni)
@@ -47,7 +47,7 @@ func (s *SNIsTestSuite) TestCreate() {
 
 	payload := &SNI{
 		Name:             "example.com",
-		SSLCertificateId: "ce9832aa-5d26-41c4-af86-197c7732df1c",
+		SSLCertificateID: "ce9832aa-5d26-41c4-af86-197c7732df1c",
 	}
 
 	sni, res, err := s.client.SNIs.Create(payload)
@@ -58,7 +58,7 @@ func (s *SNIsTestSuite) TestCreate() {
 
 	s.assert.NotEmpty(sni.Name)
 	s.assert.NotEmpty(sni.CreatedAt)
-	s.assert.NotEmpty(sni.SSLCertificateId)
+	s.assert.NotEmpty(sni.SSLCertificateID)
 }
 
 func (s *SNIsTestSuite) TestListReturnsHttpError() {
@@ -97,7 +97,7 @@ func (s *SNIsTestSuite) TestList() {
 	s.assert.NotZero(snis)
 	s.assert.NotZero(snis[0].CreatedAt.Unix())
 	s.assert.NotEmpty(snis[0].Name)
-	s.assert.NotEmpty(snis[0].SSLCertificateId)
+	s.assert.NotEmpty(snis[0].SSLCertificateID)
 }
 
 func (s *SNIsTestSuite) TestGetReturnsHttpError() {
@@ -136,7 +136,7 @@ func (s *SNIsTestSuite) TestGet() {
 
 	s.assert.NotZero(sni.CreatedAt.Unix())
 	s.assert.NotEmpty(sni.Name)
-	s.assert.NotEmpty(sni.SSLCertificateId)
+	s.assert.NotEmpty(sni.SSLCertificateID)
 }
 
 func (s *SNIsTestSuite) TestUpdateReturnsHttpError() {
@@ -150,7 +150,7 @@ func (s *SNIsTestSuite) TestUpdateReturnsHttpError() {
 
 	sni := &SNI{
 		Name:             "example.com",
-		SSLCertificateId: "ce9832aa-5d26-41c4-af86-197c7732df1c",
+		SSLCertificateID: "ce9832aa-5d26-41c4-af86-197c7732df1c",
 	}
 
 	_, res, err := s.client.SNIs.Update("example", sni)
@@ -174,7 +174,7 @@ func (s *SNIsTestSuite) TestUpdate() {
 
 	payload := &SNI{
 		Name:             "example.com",
-		SSLCertificateId: "ce9832aa-5d26-41c4-af86-197c7732df1c",
+		SSLCertificateID: "ce9832aa-5d26-41c4-af86-197c7732df1c",
 	}
 
 	sni, res, err := s.client.SNIs.Update("example.com", payload)

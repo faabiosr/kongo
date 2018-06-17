@@ -32,10 +32,10 @@ type (
 		// GetWithContext retrieves registered sni by name.
 		GetWithContext(ctx context.Context, name string) (*SNI, *http.Response, error)
 
-		// List retrieves a list of registered snis.
+		// List retrieves the registered snis.
 		List() ([]*SNI, *http.Response, error)
 
-		// ListWithContext retrieves a list of registered snis.
+		// ListWithContext retrieves the registered snis.
 		ListWithContext(ctx context.Context) ([]*SNI, *http.Response, error)
 
 		// Update updates a sni registered by name.
@@ -47,7 +47,7 @@ type (
 
 	// SNIsService it's a concrete instance of SNIs.
 	SNIsService struct {
-		// Kongo client manages communication by API.
+		// Kongo client manages communication throught API.
 		client *Kongo
 	}
 
@@ -60,7 +60,7 @@ type (
 		Name string `json:"name"`
 
 		// The "id" (a UUID) of the certificate with which to associate the SNI hostname.
-		SSLCertificateId string `json:"ssl_certificate_id"`
+		SSLCertificateID string `json:"ssl_certificate_id"`
 	}
 
 	// SNIsRoot it's a structure of API result list.
@@ -142,7 +142,7 @@ func (s *SNIsService) Get(idOrSNI string) (*SNI, *http.Response, error) {
 	return s.GetWithContext(context.TODO(), idOrSNI)
 }
 
-// ListWithContext retrieves a list of registered snis.
+// ListWithContext retrieves the registered snis.
 func (s *SNIsService) ListWithContext(ctx context.Context) ([]*SNI, *http.Response, error) {
 	resource, _ := url.Parse(snisResourcePath)
 
@@ -163,7 +163,7 @@ func (s *SNIsService) ListWithContext(ctx context.Context) ([]*SNI, *http.Respon
 	return root.SNIs, res, nil
 }
 
-// List retrieves a list of registered snis.
+// List retrieves the registered snis.
 func (s *SNIsService) List() ([]*SNI, *http.Response, error) {
 	return s.ListWithContext(context.TODO())
 }
