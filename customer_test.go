@@ -44,7 +44,7 @@ func (s *CustomersTestSuite) TestCreate() {
 
 	payload := &Customer{
 		Username: "admin",
-		CustomId: "1",
+		CustomID: "1",
 	}
 
 	customer, res, err := s.client.Customers.Create(payload)
@@ -53,7 +53,7 @@ func (s *CustomersTestSuite) TestCreate() {
 	s.assert.IsType(&http.Response{}, res)
 	s.assert.Nil(err)
 
-	s.assert.NotEmpty(customer.Id)
+	s.assert.NotEmpty(customer.ID)
 	s.assert.NotEmpty(customer.CreatedAt)
 }
 
@@ -92,17 +92,17 @@ func (s *CustomersTestSuite) TestList() {
 
 	s.assert.NotZero(customers)
 	s.assert.NotZero(customers[0].CreatedAt.Unix())
-	s.assert.NotEmpty(customers[0].Id)
-	s.assert.NotEmpty(customers[0].CustomId)
+	s.assert.NotEmpty(customers[0].ID)
+	s.assert.NotEmpty(customers[0].CustomID)
 	s.assert.NotEmpty(customers[0].Username)
 }
 
 func (s *CustomersTestSuite) TestListWithOptions() {
 	offset := "WyIzMzllZDk0YS03ZmJjLTQ1MTMtOGExMS03ZjEwMmYwOGVhMDUiXQ"
 	options := &ListCustomersOptions{
-		Id:       "ec2778a3-fdf5-4901-9f76-f93a1ac1828a",
+		ID:       "ec2778a3-fdf5-4901-9f76-f93a1ac1828a",
 		Username: "admin",
-		CustomId: "1",
+		CustomID: "1",
 		Size:     1,
 		Offset:   offset,
 	}
@@ -164,9 +164,9 @@ func (s *CustomersTestSuite) TestGet() {
 	s.assert.Nil(err)
 
 	s.assert.NotZero(customer.CreatedAt.Unix())
-	s.assert.NotEmpty(customer.Id)
+	s.assert.NotEmpty(customer.ID)
 	s.assert.NotEmpty(customer.Username)
-	s.assert.NotEmpty(customer.CustomId)
+	s.assert.NotEmpty(customer.CustomID)
 }
 
 func (s *CustomersTestSuite) TestUpdateReturnsHttpError() {
@@ -209,7 +209,7 @@ func (s *CustomersTestSuite) TestUpdate() {
 	s.assert.IsType(&http.Response{}, res)
 	s.assert.Nil(err)
 
-	s.assert.NotEmpty(customer.Id)
+	s.assert.NotEmpty(customer.ID)
 	s.assert.NotEmpty(customer.CreatedAt)
 }
 

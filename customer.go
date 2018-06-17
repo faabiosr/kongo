@@ -13,7 +13,7 @@ const (
 )
 
 type (
-	// Customers manages the Kong customer rules.
+	// Customers manages the Kong customer.
 	Customers interface {
 		// Create creates a new customer.
 		Create(customer *Customer) (*Customer, *http.Response, error)
@@ -33,10 +33,10 @@ type (
 		// GetWithContext retrieves registered customer by ID or username.
 		GetWithContext(ctx context.Context, idOrUsername string) (*Customer, *http.Response, error)
 
-		// List retrieves a list of registered customers.
+		// List retrieves the registered customers.
 		List(options *ListCustomersOptions) ([]*Customer, *http.Response, error)
 
-		// ListWithContext retrieves a list of registered customers.
+		// ListWithContext retrieves the registered customers.
 		ListWithContext(ctx context.Context, options *ListCustomersOptions) ([]*Customer, *http.Response, error)
 
 		// Update updates a customer registered by ID or Username.
@@ -48,7 +48,7 @@ type (
 
 	// CustomersService it's a concrete instance of customers.
 	CustomersService struct {
-		// Kongo client manages communication by API.
+		// Kongo client manages communication throught API.
 		client *Kongo
 	}
 
@@ -58,10 +58,10 @@ type (
 		CreatedAt Time `json:"created_at"`
 
 		// Field for storing an existing unique ID for the consumer. You must send either this field or username with the request.
-		CustomId string `json:"custom_id,omitempty"`
+		CustomID string `json:"custom_id,omitempty"`
 
 		// The identification of customer registered.
-		Id string `json:"id"`
+		ID string `json:"id"`
 
 		// The unique username of the consumer. You must send either this field or custom_id with the request.
 		Username string `json:"username,omitempty"`
@@ -76,10 +76,10 @@ type (
 	// ListCustomersOptions stores the options you can set for requesting the customer list.
 	ListCustomersOptions struct {
 		// A filter on the list based on the consumer custom_id field.
-		CustomId string `url:"custom_id, omitempty"`
+		CustomID string `url:"custom_id, omitempty"`
 
 		// A filter on the list based on the consumer id field.
-		Id string `url:"id, omitempty"`
+		ID string `url:"id, omitempty"`
 
 		// A cursor used for pagination. offset is an object identifier that defines a place in the list.
 		Offset string `url:"offset, omitempty"`
@@ -164,7 +164,7 @@ func (c *CustomersService) Get(idOrUsername string) (*Customer, *http.Response, 
 	return c.GetWithContext(context.TODO(), idOrUsername)
 }
 
-// ListWithContext retrieves a list of registered customers.
+// ListWithContext retrieves the registered customers.
 func (c *CustomersService) ListWithContext(ctx context.Context, options *ListCustomersOptions) ([]*Customer, *http.Response, error) {
 	opts, _ := query.Values(options)
 	resource, _ := url.Parse(customersResourcePath)
@@ -187,7 +187,7 @@ func (c *CustomersService) ListWithContext(ctx context.Context, options *ListCus
 	return root.Customers, res, nil
 }
 
-// List retrieves a list of registered customers.
+// List retrieves the registered customers.
 func (c *CustomersService) List(options *ListCustomersOptions) ([]*Customer, *http.Response, error) {
 	return c.ListWithContext(context.TODO(), options)
 }
