@@ -10,7 +10,7 @@
 
 ## Installation
 
-Kongo requires Go 1.9 or later.
+Kongo requires Go 1.10 or later.
 
 ```
 go get github.com/fabiorphp/kongo
