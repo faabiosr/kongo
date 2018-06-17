@@ -33,10 +33,10 @@ type (
 		// GetWithContext retrieves registered route by ID.
 		GetWithContext(ctx context.Context, id string) (*Route, *http.Response, error)
 
-		// List retrieves a list of registered routes.
+		// List retrieves the registered routes.
 		List(options *ListRoutesOptions) ([]*Route, *http.Response, error)
 
-		// ListWithContext retrieves a list of registered routes.
+		// ListWithContext retrieves the registered routes.
 		ListWithContext(ctx context.Context, options *ListRoutesOptions) ([]*Route, *http.Response, error)
 
 		// Update updates a route registered by ID.
@@ -48,20 +48,23 @@ type (
 
 	// RoutesService it's a concrete instance of route.
 	RoutesService struct {
-		// Kongo client manages communication by API.
+		// Kongo client manages communication throught API.
 		client *Kongo
 	}
 
 	// Route it's a structure of API result.
 	Route struct {
+		// The identification of route registered.
+		ID string `json:"id"`
+
 		// The date when the route was registered.
 		CreatedAt Time `json:"created_at"`
 
+		// The date when the route was updated.
+		UpdatedAt Time `json:"updated_at"`
+
 		// A list of domain names that match this Route. At least one of hosts, paths, or methods must be set.
 		Hosts []string `json:"hosts,omitempty"`
-
-		// The identification of route registered.
-		Id string `json:"id"`
 
 		// A list of HTTP methods that match this Route. At least one of hosts, paths, or methods must be set.
 		Methods []string `json:"methods,omitempty"`
@@ -69,26 +72,23 @@ type (
 		// A list of paths that match this Route. At least one of hosts, paths, or methods must be set.
 		Paths []string `json:"paths,omitempty"`
 
-		// When matching a Route via one of the hosts domain names, use the request Host header in the upstream request headers.
-		PreserveHost bool `json:"preserve_host,omitempty"`
-
 		// A list of the protocols this Route should allow. By default it is ["http", "https"].
 		Protocols []string `json:"protocols"`
 
 		// The Service this Route is associated to. This is where the Route proxies traffic to.
 		Service RouteService `json:"service"`
 
+		// When matching a Route via one of the hosts domain names, use the request Host header in the upstream request headers.
+		PreserveHost bool `json:"preserve_host,omitempty"`
+
 		// When matching a Route via one of the paths, strip the matching prefix from the upstream request URL.
 		StripPath bool `json:"strip_path,omitempty"`
-
-		// The date when the route was updated.
-		UpdatedAt Time `json:"updated_at"`
 	}
 
 	// RouteService it's a structure of API result.
 	RouteService struct {
 		// Service id associated.
-		Id string `json:"id"`
+		ID string `json:"id"`
 	}
 
 	// RoutesRoot it's a structure of API result list.
@@ -179,7 +179,7 @@ func (r *RoutesService) Get(id string) (*Route, *http.Response, error) {
 	return r.GetWithContext(context.TODO(), id)
 }
 
-// ListWithContext retrieves a list of registered routes.
+// ListWithContext retrieves the registered routes.
 func (r *RoutesService) ListWithContext(ctx context.Context, options *ListRoutesOptions) ([]*Route, *http.Response, error) {
 	opts, _ := query.Values(options)
 	resource, _ := url.Parse(routesResourcePath)
@@ -202,7 +202,7 @@ func (r *RoutesService) ListWithContext(ctx context.Context, options *ListRoutes
 	return root.Routes, res, nil
 }
 
-// List retrieves a list of registered routes.
+// List retrieves the registered routes.
 func (r *RoutesService) List(options *ListRoutesOptions) ([]*Route, *http.Response, error) {
 	return r.ListWithContext(context.TODO(), options)
 }

@@ -45,7 +45,7 @@ func (s *RoutesTestSuite) TestCreate() {
 	payload := &Route{
 		Protocols: []string{"https"},
 		Hosts:     []string{"foo.org"},
-		Service:   RouteService{Id: "0daad537-6699-4765-baa1-dbe74a95d541"},
+		Service:   RouteService{ID: "0daad537-6699-4765-baa1-dbe74a95d541"},
 	}
 
 	route, res, err := s.client.Routes.Create(payload)
@@ -54,10 +54,10 @@ func (s *RoutesTestSuite) TestCreate() {
 	s.assert.IsType(&http.Response{}, res)
 	s.assert.Nil(err)
 
-	s.assert.NotEmpty(route.Id)
+	s.assert.NotEmpty(route.ID)
 	s.assert.NotEmpty(route.CreatedAt)
 	s.assert.NotEmpty(route.UpdatedAt)
-	s.assert.Equal(route.Service.Id, payload.Service.Id)
+	s.assert.Equal(route.Service.ID, payload.Service.ID)
 }
 
 func (s *RoutesTestSuite) TestListReturnsHttpError() {
@@ -96,12 +96,12 @@ func (s *RoutesTestSuite) TestList() {
 	s.assert.NotZero(routes)
 	s.assert.NotZero(routes[0].CreatedAt.Unix())
 	s.assert.NotZero(routes[0].Hosts)
-	s.assert.NotEmpty(routes[0].Id)
+	s.assert.NotEmpty(routes[0].ID)
 	s.assert.NotZero(routes[0].Methods)
 	s.assert.NotZero(routes[0].Paths)
 	s.assert.False(routes[0].PreserveHost)
 	s.assert.NotZero(routes[0].Protocols)
-	s.assert.NotEmpty(routes[0].Service.Id)
+	s.assert.NotEmpty(routes[0].Service.ID)
 	s.assert.True(routes[0].StripPath)
 	s.assert.NotZero(routes[0].UpdatedAt.Unix())
 }
@@ -165,12 +165,12 @@ func (s *RoutesTestSuite) TestGet() {
 
 	s.assert.NotZero(route.CreatedAt.Unix())
 	s.assert.NotZero(route.Hosts)
-	s.assert.NotEmpty(route.Id)
+	s.assert.NotEmpty(route.ID)
 	s.assert.NotZero(route.Methods)
 	s.assert.NotZero(route.Paths)
 	s.assert.False(route.PreserveHost)
 	s.assert.NotZero(route.Protocols)
-	s.assert.NotEmpty(route.Service.Id)
+	s.assert.NotEmpty(route.Service.ID)
 	s.assert.True(route.StripPath)
 	s.assert.NotZero(route.UpdatedAt.Unix())
 }
@@ -215,7 +215,7 @@ func (s *RoutesTestSuite) TestUpdate() {
 	s.assert.IsType(&http.Response{}, res)
 	s.assert.Nil(err)
 
-	s.assert.NotEmpty(route.Id)
+	s.assert.NotEmpty(route.ID)
 	s.assert.NotEmpty(route.CreatedAt)
 	s.assert.NotEmpty(route.UpdatedAt)
 }
