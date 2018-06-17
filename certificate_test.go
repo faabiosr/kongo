@@ -57,7 +57,7 @@ func (s *CertificatesTestSuite) TestCreate() {
 	s.assert.IsType(&http.Response{}, res)
 	s.assert.Nil(err)
 
-	s.assert.NotEmpty(certificate.Id)
+	s.assert.NotEmpty(certificate.ID)
 	s.assert.NotEmpty(certificate.CreatedAt)
 	s.assert.NotEmpty(certificate.Cert)
 	s.assert.NotEmpty(certificate.Key)
@@ -100,7 +100,7 @@ func (s *CertificatesTestSuite) TestList() {
 	s.assert.NotZero(certificates)
 	s.assert.NotZero(certificates[0].CreatedAt.Unix())
 	s.assert.NotEmpty(certificates[0].Cert)
-	s.assert.NotEmpty(certificates[0].Id)
+	s.assert.NotEmpty(certificates[0].ID)
 	s.assert.NotZero(certificates[0].SNIs)
 }
 
@@ -139,7 +139,7 @@ func (s *CertificatesTestSuite) TestGet() {
 	s.assert.Nil(err)
 
 	s.assert.NotZero(certificate.CreatedAt.Unix())
-	s.assert.NotEmpty(certificate.Id)
+	s.assert.NotEmpty(certificate.ID)
 	s.assert.NotEmpty(certificate.Cert)
 	s.assert.NotEmpty(certificate.Key)
 	s.assert.NotZero(certificate.SNIs)
@@ -189,7 +189,7 @@ func (s *CertificatesTestSuite) TestUpdate() {
 	s.assert.IsType(&http.Response{}, res)
 	s.assert.Nil(err)
 
-	s.assert.NotEmpty(certificate.Id)
+	s.assert.NotEmpty(certificate.ID)
 	s.assert.NotEmpty(certificate.CreatedAt)
 }
 

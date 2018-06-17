@@ -32,10 +32,10 @@ type (
 		// GetWithContext retrieves registered certificate by ID or SNI.
 		GetWithContext(ctx context.Context, idOrSNI string) (*Certificate, *http.Response, error)
 
-		// List retrieves a list of registered certificates.
+		// List retrieves the registered certificates.
 		List() ([]*Certificate, *http.Response, error)
 
-		// ListWithContext retrieves a list of registered certificates.
+		// ListWithContext retrieves the registered certificates.
 		ListWithContext(ctx context.Context) ([]*Certificate, *http.Response, error)
 
 		// Update updates a certificate registered by ID or SNI.
@@ -47,7 +47,7 @@ type (
 
 	// CertificatesService it's a concrete instance of certificates.
 	CertificatesService struct {
-		// Kongo client manages communication by API.
+		// Kongo client manages communication throught API.
 		client *Kongo
 	}
 
@@ -60,7 +60,7 @@ type (
 		CreatedAt Time `json:"created_at"`
 
 		// The identification of certificate registered.
-		Id string `json:"id"`
+		ID string `json:"id"`
 
 		// PEM-encoded private key of the SSL key pair.
 		Key string `json:"key"`
@@ -148,7 +148,7 @@ func (c *CertificatesService) Get(idOrSNI string) (*Certificate, *http.Response,
 	return c.GetWithContext(context.TODO(), idOrSNI)
 }
 
-// ListWithContext retrieves a list of registered certificates.
+// ListWithContext retrieves the registered certificates.
 func (c *CertificatesService) ListWithContext(ctx context.Context) ([]*Certificate, *http.Response, error) {
 	resource, _ := url.Parse(certificatesResourcePath)
 
@@ -169,7 +169,7 @@ func (c *CertificatesService) ListWithContext(ctx context.Context) ([]*Certifica
 	return root.Certificates, res, nil
 }
 
-// List retrieves a list of registered certificates.
+// List retrieves the registered certificates.
 func (c *CertificatesService) List() ([]*Certificate, *http.Response, error) {
 	return c.ListWithContext(context.TODO())
 }
