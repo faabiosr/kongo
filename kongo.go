@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	version   = "v0"
+	version   = "v1"
 	userAgent = "kongo/" + version
 	mediaType = "application/json"
 )
