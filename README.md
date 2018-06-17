@@ -27,19 +27,32 @@ go get gopkg.in/fabiorphp/kongo.v0
 package main
 
 import (
+    "fmt"
     "github.com/fabiorphp/kongo"
+    "log"
 )
 
 func main() {
-    kongo := kongo.New(nil, "127.0.0.1:8001")
-    status, _, _ := kongo.Node.Status()
-    ...
+    k, err := kongo.New(nil, "http://127.0.0.1:8001")
+
+    if err != nil {
+        log.Fatal(err)
+    }
+
+    status, _, err := k.Node.Status()
+
+    if err != nil {
+        log.Fatal(err)
+    }
+
+    fmt.Printf("Requests: %d\n", status.Server.TotalRequests)
 }
 ```
 
 ## Documentation
 
 Read the full documentation at [https://godoc.org/github.com/fabiorphp/kongo](https://godoc.org/github.com/fabiorphp/kongo).
+Please look at the [Kong](https://getkong.org/docs/) docs for more information about the Rest-API.
 
 ## Development
 

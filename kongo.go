@@ -20,6 +20,11 @@ const (
 	mediaType = "application/json"
 )
 
+var (
+	// ErrEmptyURL retrieves a error message for empty URLs.
+	ErrEmptyURL = errors.New("Empty URL is not allowed")
+)
+
 type (
 	// Kongo manages communication with Kong Admin API.
 	Kongo struct {
@@ -28,27 +33,24 @@ type (
 		client *http.Client
 
 		// Kong server base URL.
-		BaseURL *url.URL
+		baseURL *url.URL
 
-		// User agent for client
-		UserAgent string
-
-		// Node api service
+		// Node api service.
 		Node Node
 
-		// Services api service
+		// Services api service.
 		Services Services
 
-		// Routes api service
+		// Routes api service.
 		Routes Routes
 
-		// Customers api service
+		// Customers api service.
 		Customers Customers
 
-		//Certificates api service
+		//Certificates api service.
 		Certificates Certificates
 
-		//SNIs api service
+		//SNIs api service.
 		SNIs SNIs
 	}
 
@@ -74,10 +76,10 @@ func NewClient(client *http.Client, baseURL *url.URL) (*Kongo, error) {
 	}
 
 	if baseURL == nil {
-		return nil, errors.New("Empty URL is not allowed")
+		return nil, ErrEmptyURL
 	}
 
-	k := &Kongo{client: client, BaseURL: baseURL, UserAgent: userAgent}
+	k := &Kongo{client: client, baseURL: baseURL}
 	k.Node = &NodeService{k}
 	k.Services = &ServicesService{k}
 	k.Routes = &RoutesService{k}
@@ -91,7 +93,7 @@ func NewClient(client *http.Client, baseURL *url.URL) (*Kongo, error) {
 // New returns a new Kongo API client.
 func New(client *http.Client, baseURL string) (*Kongo, error) {
 	if baseURL == "" {
-		return nil, errors.New("Empty URL is not allowed")
+		return nil, ErrEmptyURL
 	}
 
 	parsedURL, err := url.Parse(baseURL)
@@ -106,7 +108,7 @@ func New(client *http.Client, baseURL string) (*Kongo, error) {
 // NewRequest creates an API requrest. A relative URL can be provided in res URL instance. If specified, the
 // value pointed to by body JSON encoded and included in as the request body.
 func (k *Kongo) NewRequest(ctx context.Context, method string, res *url.URL, body interface{}) (*http.Request, error) {
-	url := k.BaseURL.ResolveReference(res)
+	url := k.baseURL.ResolveReference(res)
 
 	buf := new(bytes.Buffer)
 
@@ -141,7 +143,13 @@ func (k *Kongo) Do(req *http.Request, value interface{}) (*http.Response, error)
 		return nil, err
 	}
 
-	defer res.Body.Close()
+	defer func(res *http.Response) {
+		err = res.Body.Close()
+	}(res)
+
+	if err != nil {
+		return nil, err
+	}
 
 	err = k.checkResponse(res)
 

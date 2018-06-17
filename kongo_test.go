@@ -19,9 +19,8 @@ type (
 	BaseTestSuite struct {
 		suite.Suite
 
-		assert  *assert.Assertions
-		client  *Kongo
-		baseUrl string
+		assert *assert.Assertions
+		client *Kongo
 
 		mux    *http.ServeMux
 		server *httptest.Server
@@ -69,13 +68,13 @@ func (s *BaseTestSuite) LoadFixture(filePath string) (io.ReadCloser, error) {
 func (s *KongoTestSuite) TestFactoryClientWithEmptyURL() {
 	_, err := NewClient(nil, nil)
 
-	s.assert.EqualError(err, "Empty URL is not allowed")
+	s.assert.EqualError(err, ErrEmptyURL.Error())
 }
 
 func (s *KongoTestSuite) TestFactoryWithEmptyURL() {
 	_, err := New(nil, "")
 
-	s.assert.EqualError(err, "Empty URL is not allowed")
+	s.assert.EqualError(err, ErrEmptyURL.Error())
 }
 
 func (s *KongoTestSuite) TestFactoryWithInvalidURL() {
@@ -86,7 +85,6 @@ func (s *KongoTestSuite) TestFactoryWithInvalidURL() {
 
 func (s *KongoTestSuite) TestInstance() {
 	s.assert.IsType(new(Kongo), s.client)
-	s.assert.Equal(userAgent, s.client.UserAgent)
 	s.assert.Implements(new(Node), s.client.Node)
 	s.assert.Implements(new(Services), s.client.Services)
 	s.assert.Implements(new(Routes), s.client.Routes)
